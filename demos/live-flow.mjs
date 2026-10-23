@@ -15,6 +15,7 @@ export default {
     { pause: 2500, as: 'intro' },
     { click: { text: 'Start live scan' } },
     { wait: { text: 'card ready' }, as: 'first-card' },
+    { wait: { text: 'Scan complete' }, timeout: 60000 },
     { pause: 2500 },
     { click: '[data-do="review-ready"]' },
     { wait: '#swipe-card' },

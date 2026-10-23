@@ -61,3 +61,4 @@ node_modules/
 
 # record-demo run manifests (local paths)
 demos/*.manifest.json
+macos/OpenLoopsBar

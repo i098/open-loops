@@ -33,7 +33,29 @@ export function snowflakeConfig(env = process.env) {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export async function runStatement(
+// Every statement this process runs, newest first, for the /backend view.
+export const queryLog = [];
+
+export async function runStatement(cfg, statement, bindings, opts = {}) {
+  const entry = {
+    at: new Date().toISOString(),
+    statement: statement.replace(/\s+/g, ' ').slice(0, 220),
+    status: 'running',
+  };
+  queryLog.unshift(entry);
+  queryLog.length = Math.min(queryLog.length, 60);
+  const t = Date.now();
+  try {
+    const out = await runStatementRaw(cfg, statement, bindings, opts);
+    Object.assign(entry, { status: 'ok', ms: Date.now() - t, rows: out.rows.length });
+    return out;
+  } catch (err) {
+    Object.assign(entry, { status: 'error', ms: Date.now() - t, error: err.message.slice(0, 160) });
+    throw err;
+  }
+}
+
+async function runStatementRaw(
   cfg,
   statement,
   bindings,

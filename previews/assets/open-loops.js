@@ -300,7 +300,10 @@
     scanEvents = [],
     scanTimers = [];
   let liveSource = null;
-  const sample = (text) => (LIVE ? text.replace(/\b[Ss]ample /g, '') : text);
+  const sample = (text) =>
+    LIVE
+      ? text.replace(/\b[Ss]ample ([a-z])/g, (m, c, i) => (i === 0 ? c.toUpperCase() : c))
+      : text;
   const handled = new Set(),
     accepted = new Set();
   const navigation = [],
@@ -511,7 +514,9 @@
           : scanStatus === 'failed'
             ? `${readyIds.size} ready`
             : LIVE
-              ? 'Ready to scan'
+              ? scanStatus === 'complete'
+                ? `${readyIds.size} ready`
+                : 'Ready to scan'
               : 'Setup preview';
     age.textContent = current
       ? copy[current.id].age
@@ -750,7 +755,7 @@
   }
   function renderTaskContent(next) {
     if (next === 'brief' || next === 'edit') {
-      body.innerHTML = `<div class="face">${title(taskLabel())}<p class="face-context">${LIVE ? 'Claude' : 'Demo agent'} · ${current.record}</p><dl class="scope-list"><div><dt>Read</dt><dd>${task.childCard.read}</dd></div><div><dt>Return</dt><dd>${task.childCard.output}</dd></div><div><dt>Limits</dt><dd>No messages, record changes, approvals or screen access.</dd></div></dl><p class="brief-label">Exact outgoing brief</p>${next === 'edit' ? `<label class="sr-only" for="action-note">Task brief</label><textarea class="note-field" id="action-note" maxlength="900">${esc(note)}</textarea>` : `<div class="exact-brief" id="payload-note" data-selectable>${esc(note)}</div><button class="evidence-link" data-do="edit">Edit brief</button>`}<p class="fine-print">${LIVE ? `Accept sends this brief and the cited records to ${esc(LIVE.model)}.` : 'Preview only. No model request leaves this browser.'}</p><p class="form-error" id="form-error" role="status"></p></div>`;
+      body.innerHTML = `<div class="face">${title(taskLabel())}<p class="face-context">${LIVE ? 'Claude' : 'Demo agent'} · ${current.record}</p><dl class="scope-list"><div><dt>Read</dt><dd>${task.childCard.read}</dd></div><div><dt>Return</dt><dd>${task.childCard.output}</dd></div><div><dt>Limits</dt><dd>No messages, record changes, approvals or screen access.</dd></div></dl><p class="brief-label">Exact outgoing brief</p>${next === 'edit' ? `<label class="sr-only" for="action-note">Task brief</label><textarea class="note-field" id="action-note" maxlength="900">${esc(note)}</textarea>` : `<div class="exact-brief" id="payload-note" data-selectable>${esc(note)}</div><button class="evidence-link" data-do="edit">Edit brief</button>${LIVE ? '<button class="evidence-link" data-do="open-claude">Open in Claude, prefilled</button>' : ''}`}<p class="fine-print">${LIVE ? `Accept sends this brief and the cited records to ${esc(LIVE.model)}.` : 'Preview only. No model request leaves this browser.'}</p><p class="form-error" id="form-error" role="status"></p></div>`;
       const existingJob = jobs.get(current.id),
         acceptLabel =
           existingJob && existingJob.status !== 'canceled'
@@ -778,7 +783,7 @@
     if (next === 'result') {
       const resultTitle = taskLabel().startsWith('Draft') ? 'Draft ready' : 'Summary ready';
       body.innerHTML = `<div class="face">${title(resultTitle)}<div class="result-copy" data-selectable>${task.result}</div><p class="fine-print">${LIVE ? 'Drafted by Claude. Nothing was sent or changed.' : 'Prepared in this preview. Nothing was sent.'}</p><button class="evidence-link" data-do="evidence">View evidence</button></div>`;
-      footer.innerHTML = `<div class="action-pair">${task.write ? button(task.write.operation.startsWith('Close') ? 'Review closing' : 'Review sending', 'review-write') : ''}${button('Next quest', 'next', true)}</div>`;
+      footer.innerHTML = `<div class="action-pair">${LIVE ? button('Continue in Claude', 'open-claude') : ''}${task.write ? button(task.write.operation.startsWith('Close') ? 'Review closing' : 'Review sending', 'review-write') : ''}${button('Next quest', 'next', true)}</div>`;
       footer.hidden = false;
     }
   }
@@ -864,6 +869,30 @@
       footer.innerHTML = button('Next quest', 'next', true);
       footer.hidden = false;
     }
+  }
+  // Live: open Claude with the brief, the cited evidence and any draft already in the composer.
+  function claudePrompt() {
+    const plain = (h) => {
+      const d = document.createElement('div');
+      d.innerHTML = h || '';
+      return d.textContent.trim();
+    };
+    return [
+      `Open loop ${current.record} (${current.kind}). Read/draft only: do not send, approve or change records.`,
+      `Task: ${note}`,
+      `Evidence:\n${plain(current.quote)}\n${plain(current.cite)}\n${plain(current.evidence)}`,
+      task?.result ? `Draft so far:\n${plain(task.result)}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+  }
+  function openInClaude() {
+    const url = `https://claude.ai/new?q=${encodeURIComponent(claudePrompt().slice(0, 6000))}`;
+    const popup = window.open(url, '_blank', 'noopener');
+    status.textContent =
+      popup === null
+        ? 'Browser blocked the Claude window.'
+        : 'Claude opened with the prompt prefilled. Nothing was sent.';
   }
   async function handoffPrompt(toolName) {
     const destinations = { claude: 'https://claude.ai/', codex: 'https://chatgpt.com/codex/' };
@@ -972,7 +1001,11 @@
       fetch('/api/run', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ record: job.quest.record, brief: job.note }),
+        body: JSON.stringify({
+          record: job.quest.record,
+          brief: job.note,
+          action: job.task.childCard?.title || job.task.label,
+        }),
       })
         .then((r) => r.json())
         .catch((err) => ({ error: err.message }))
@@ -1603,6 +1636,7 @@
       return;
     }
     if (command === 'dispatch' && view === 'brief') return dispatchTask(e);
+    if (command === 'open-claude') return openInClaude();
     if (command === 'review-write') {
       const existing = sourceActions.get(sourceKey(current, task));
       if (existing && existing.status !== 'failed') {

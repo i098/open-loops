@@ -85,6 +85,9 @@ Rules: use only the supplied evidence; never invent people, dates, amounts or st
 Every action is read or draft only: summarize, recommend, or draft a message. Never send, approve, pay, close, revoke or change anything.
 Write for a busy owner: concrete, short, no filler.`;
 
+const JOB_RULES = `You are executing one accepted read/draft task. Return only the result as plain text (no markdown, no headings, no preamble), under 90 words.
+Cite evidence inline as [1], [2]. If a draft message is requested, write it ready to paste; it will not be sent.`;
+
 function evidenceBlock(loop) {
   return [
     `Loop ${loop.LOOP_ID} (${loop.KIND}) in ${loop.SOURCE_SYSTEM}: ${loop.TITLE}`,
@@ -145,9 +148,7 @@ export async function runJob(cfg, loop, brief, opts) {
     cfg,
     {
       max_tokens: 700,
-      system: `${SYSTEM}
-You are executing one accepted read/draft task. Return only the result as plain text (no markdown, no headings, no preamble), under 90 words.
-Cite evidence inline as [1], [2]. If a draft message is requested, write it ready to paste; it will not be sent.`,
+      system: `${SYSTEM}\n${JOB_RULES}`,
       messages: [{ role: 'user', content: `${evidenceBlock(loop)}\n\nTask brief:\n${brief}` }],
     },
     opts,
@@ -159,4 +160,82 @@ Cite evidence inline as [1], [2]. If a draft message is requested, write it read
     .trim();
   if (!text) throw Error('Claude returned no result text');
   return { text, usage: out.usage, model: out.model };
+}
+
+// Claude inside Snowflake Cortex: AI_COMPLETE over the same SQL API connection.
+// https://docs.snowflake.com/en/sql-reference/functions/ai_complete
+export function cortexConfig(env = process.env) {
+  return env.OPEN_LOOPS_LLM === 'anthropic'
+    ? null
+    : { model: env.CORTEX_MODEL || 'claude-sonnet-5-5' };
+}
+
+// AI_COMPLETE occasionally returns NULL; retry before failing the card or job.
+async function cortexComplete(sf, run, model, prompt, maxTokens, tries = 3) {
+  for (let i = 1; ; i++) {
+    try {
+      return await cortexCompleteOnce(sf, run, model, prompt, maxTokens);
+    } catch (err) {
+      if (i >= tries) throw err;
+    }
+  }
+}
+
+async function cortexCompleteOnce(sf, run, model, prompt, maxTokens) {
+  const { rows } = await run(
+    sf,
+    "SELECT AI_COMPLETE(model => ?, prompt => ?, model_parameters => {'max_tokens': " +
+      Number(maxTokens) +
+      '}) AS R',
+    { 1: { type: 'TEXT', value: model }, 2: { type: 'TEXT', value: prompt } },
+  );
+  let out = rows[0]?.R;
+  if (typeof out === 'string') {
+    try {
+      out = JSON.parse(out);
+    } catch {
+      /* plain string */
+    }
+  }
+  if (typeof out !== 'string' || !out.trim()) throw Error('Cortex returned no text');
+  return out;
+}
+
+export async function cortexCardPack(sf, run, model, loop, picks = '') {
+  try {
+    return await cortexCardPackOnce(sf, run, model, loop, picks);
+  } catch {
+    return cortexCardPackOnce(sf, run, model, loop, picks);
+  }
+}
+
+async function cortexCardPackOnce(sf, run, model, loop, picks) {
+  const shape = JSON.stringify(PACK_TOOL.input_schema.properties);
+  const text = await cortexComplete(
+    sf,
+    run,
+    model,
+    `${SYSTEM}\n\n${evidenceBlock(loop)}${picks ? `\n\nThis person's recent picks (put the kind of action they tend to choose first):\n${picks}` : ''}\n\nReturn ONLY one JSON object (no prose, no code fence) with these fields: ${shape}`,
+    1500,
+  );
+  let pack;
+  try {
+    pack = JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1));
+  } catch {
+    throw Error(`Cortex card for ${loop.LOOP_ID} was not JSON`);
+  }
+  pack = validatePack(loop, pack);
+  pack.headline = pack.headline.replace(/\\n/g, '\n');
+  return { pack, usage: null, model: `${model} via Snowflake Cortex` };
+}
+
+export async function cortexRunJob(sf, run, model, loop, brief) {
+  const text = await cortexComplete(
+    sf,
+    run,
+    model,
+    `${SYSTEM}\n${JOB_RULES}\n\n${evidenceBlock(loop)}\n\nTask brief:\n${brief}`,
+    700,
+  );
+  return { text: text.trim(), usage: null, model: `${model} via Snowflake Cortex` };
 }
