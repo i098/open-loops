@@ -134,6 +134,48 @@
       .empty {
         color: var(--muted);
       }
+      .pill {
+        white-space: nowrap;
+      }
+      header {
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      h1 {
+        white-space: nowrap;
+      }
+      #journal td:nth-child(-n + 3) {
+        white-space: nowrap;
+      }
+      #queries li.empty {
+        background: none !important;
+        box-shadow: none !important;
+        padding-left: 0 !important;
+      }
+      /* Point the eye: the newest statement and journal row stand out, the rest recede. */
+      li,
+      tr {
+        transition: opacity 0.4s;
+      }
+      #queries li:not(:first-child),
+      #journal tr:not(:first-child) {
+        opacity: 0.45;
+      }
+      #queries li:first-child,
+      #journal tr:first-child td {
+        background: #fff4d6;
+        box-shadow: inset 4px 0 0 #e0a42a;
+      }
+      #queries li:first-child {
+        padding-left: 12px;
+        border-radius: 8px;
+      }
+      #journal tr:first-child td {
+        box-shadow: none;
+      }
+      #journal tr:first-child td:first-child {
+        box-shadow: inset 4px 0 0 #e0a42a;
+      }
     </style>
   </head>
   <body>
