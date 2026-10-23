@@ -49,11 +49,11 @@ The browser suite exercises rendered interactions, not source-text markers. Sent
 
 ## GitHub and current delivery boundary
 
-Private repository: [i098/open-loops](https://github.com/i098/open-loops). Documentation bootstrap `dd4ff34` is on main; final previews/CI are being prepared on `feat/verified-previews-ci` for a reviewable PR. No automatic merge or hosted deployment is authorized.
+Repository: [i098/open-loops](https://github.com/i098/open-loops). [Draft PR #1](https://github.com/i098/open-loops/pull/1) publishes the verified previews and plans from `feat/verified-previews-ci`; it is not merged. The repository was created private, but a later API read returned `private: false`, `visibility: public`. That unexpected external change was reported and preserved; this workstream did not change visibility. No automatic merge or hosted deployment is authorized.
 
 Every PR and main push runs path detection and the stable **PR gate**. Relevant formatting, lint, browser/policy tests, and Sentrux must succeed; irrelevant jobs may skip. Changes to packaged inputs create a downloadable review artifact on PRs and a continuous-delivery artifact on main. Unrelated changes do not rebuild the preview.
 
-**Branch protection is not enforced:** GitHub returns HTTP 403, `Upgrade to GitHub Pro or make this repository public to enable this feature.` Repository admin access is confirmed. The repository remains private; GitHub Pro is required to enforce protection while private. Workflow success is not a substitute for that setting.
+**Branch protection is not configured by this workstream:** the earlier private-repository attempt returned HTTP 403 requiring GitHub Pro or public visibility. That historical entitlement blocker is not a claim about the now-public repository. Protection was not retried after the unexpected visibility change. Workflow success alone does not enforce a branch rule.
 
 ## Initialization receipt
 

@@ -1,6 +1,6 @@
 # Open Loops — delivery plan
 
-**Current boundary:** browser prototypes and documented plans. The native Tauri application, Snowflake/model connections, SQLite/Keychain integration, native sensing, and source writes are not implemented. The private GitHub repository has a documentation bootstrap; completed previews and CI are being prepared on `feat/verified-previews-ci` for a reviewable PR, not an automatic merge.
+**Current boundary:** browser prototypes and documented plans. The native Tauri application, Snowflake/model connections, SQLite/Keychain integration, native sensing, and source writes are not implemented. The previews and CI are published in [draft PR #1](https://github.com/i098/open-loops/pull/1), not merged. Repository visibility now reads public after an unexpected external change; this workstream preserved it.
 
 ## Read the plan
 
@@ -9,7 +9,7 @@
 | [Architecture](docs/architecture.md)                    | Canonical Mermaid architecture, async runtime, integration gates, and native onboarding tree                                   |
 | [UI design](docs/ui-design.md)                          | Physical-card silhouette, fixed navigation, precise copy/gestures, and first-run states                                        |
 | [Implementation reference](docs/implementation-plan.md) | Complete data model/ownership, command boundaries, privacy, provider/source safety, file-level sequence, checks, and packaging |
-| [CI and publication](docs/CI.md)                        | Actual tooling, path matrix, stable `PR gate`, Sentrux findings, private GitHub publication and downloadable artifacts         |
+| [CI and publication](docs/CI.md)                        | Actual tooling, path matrix, stable `PR gate`, Sentrux findings, GitHub publication and downloadable artifacts                 |
 | [README](README.md)                                     | Delivered status, preview entry points, initialization receipt, and remaining prerequisites                                    |
 
 Source hashes and transformations belong in [snapshot.json](docs/verification/snapshot.json); exercised checks belong in [local checks](docs/verification/local-checks.md). These receipts must match the final imported revision. This overview makes no current-pass claim; the old 61-check report is not current proof.
@@ -115,7 +115,7 @@ The [implementation reference](docs/implementation-plan.md) records exact propos
 
 ## 6. GitHub, quality, and continuous delivery
 
-The repository is private: [i098/open-loops](https://github.com/i098/open-loops). Documentation bootstrap commit: `dd4ff34`. Preview publication targets a reviewable feature PR; do not auto-merge it. Current publication receipts belong in [CI.md](docs/CI.md).
+Repository: [i098/open-loops](https://github.com/i098/open-loops), currently public. Documentation bootstrap commit: `dd4ff34`. [Draft PR #1](https://github.com/i098/open-loops/pull/1) remains unmerged. Current publication and visibility receipts belong in [CI.md](docs/CI.md).
 
 Every PR and main push runs path detection plus a stable **`PR gate`**, even for docs-only changes. Relevant format/lint/browser/Sentrux checks must succeed. Truly irrelevant jobs may skip; relevant cancellation, missing output, or skipped work fails. Workflow/toolchain/policy changes trigger every applicable check. No secrets are exposed to fork PRs.
 
@@ -123,7 +123,7 @@ Real Sentrux 0.5.7 uses pinned binary/grammar hashes, telemetry opt-out, strict 
 
 A successful main push creates an actual downloadable preview archive with a SHA-256 manifest. A successful PR may produce a review artifact when packaged inputs change. Neither means hosted deployment or native release. The exact path matrix, Action pins, commands, results, and GitHub run/artifact links belong in [CI.md](docs/CI.md).
 
-**Protection is not enforced yet:** repo admin access is present, but GitHub returned HTTP 403: `Upgrade to GitHub Pro or make this repository public to enable this feature.` Keep private pending the user's decision; do not claim the workflow gate is server-enforced branch protection.
+**Protection is not configured by this workstream:** the historical HTTP 403 was an entitlement restriction while the repository was private. Visibility now reads public after an external change; protection was not retried. Do not claim the workflow gate is server-enforced branch protection.
 
 ## 7. Final handoff gates
 

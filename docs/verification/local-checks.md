@@ -18,7 +18,7 @@ HTML imports extract executable JS/CSS, rebase relative CSS URLs, retain executi
 | `npm run format:check`  | Pass                                                                                                   |
 | `npm run lint`          | ESLint, HTML validation, Stylelint, Markdownlint pass                                                  |
 | `npm test`              | 13 policy/import tests pass; zero skipped                                                              |
-| `npm run test:ui`       | All 9 Chromium tests pass in 12.1 seconds; zero skipped/retried                                        |
+| `npm run test:ui`       | All 9 Chromium tests pass in 12.2 seconds; zero skipped/retried                                        |
 | `npm run check:sentrux` | Sentrux 0.5.7: all 3 strict rules pass; 3 application JS / 12 total first-party JS files; quality 6824 |
 | `npm run bundle`        | Created `dist/open-loops-preview.tar.gz` with per-file SHA-256 manifest                                |
 
@@ -33,6 +33,8 @@ Local runtime: Node v26.12.1, npm 11.20.0. Hosted CI uses Node 24; local success
 5. My day filters preserve totals and expose observed/inferred/demo provenance, linked evidence, and explicitly synthetic source receipts rather than live telemetry.
 
 ## Findings resolved
+
+The first hosted Linux run found a test event-completion race: after a real Close tap returned, the next buddy tap resolved while the dialog was still open. The test now waits for the observable hidden dialog before reopening, without changing input type or adding sleeps, forced clicks, retries, or skips. This is a test synchronization fix, not a recovered product change; canonical source stays unchanged.
 
 Earlier full runs exposed a fast buddy-drag capture bug and missing Back while a source receipt was pending. The canonical owner acquired pointer capture on pointerdown, retained the 8px threshold and up/cancel release, and made parent return independent of action-busy guards. History-aware return also covers activity. Async identity guards remain intact.
 
@@ -50,4 +52,4 @@ Old small-card/inside-Back screenshots and earlier 61-check reports are supersed
 
 ## Cleanup and hosted status
 
-Playwright closed its browser contexts/server. The independent delivery tab and its uniquely named local server were closed; other workers' and user tabs/processes were not touched. Hosted PR, workflow, and artifact receipts are recorded in [CI.md](../CI.md) after publication; branch protection remains blocked by the previously observed private-repository GitHub Pro entitlement restriction.
+Playwright closed its browser contexts/server. The independent delivery tab, diagnostic browser, and their uniquely named local servers were closed; other workers' and user tabs/processes were not touched. Hosted PR, workflow, and artifact receipts are recorded in [CI.md](../CI.md). Repository visibility now reads public after an unexpected external change; this workstream preserved it. The earlier private-repository protection error is historical, not a current public-repository entitlement claim.

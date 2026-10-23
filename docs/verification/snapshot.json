@@ -24,7 +24,7 @@
       "passed": 9,
       "skipped": 0,
       "retries": 0,
-      "seconds": 12.1
+      "seconds": 12.2
     },
     "sentrux": {
       "version": "0.5.7",
@@ -176,11 +176,11 @@
   "documents": [
     {
       "path": "README.md",
-      "sha256": "5aae54ee50b8cb469e26198991be3864eddd793323d27776c0878874f0368d44"
+      "sha256": "fe73ddcc2c43be919831e16d91de4512e170d6ada1625d974cd1748a552c0211"
     },
     {
       "path": "PLAN.md",
-      "sha256": "d71c45f02283fc53b9d4586433d7f0271eb4ac92bf287f65ff3dd41675ced93e"
+      "sha256": "d8093e5d1290a2fd2167f6b0a6d0c11bb7d29b789b080e354246e9dedf671131"
     },
     {
       "path": "docs/architecture.md",
@@ -192,7 +192,7 @@
     },
     {
       "path": "docs/ui-design.md",
-      "sha256": "d39b205a733ff4726d9ffefdedf66db7d71d3638f3f511bbd81ab9cf58a6f43e"
+      "sha256": "78a79a68f3c02912a3857bffc1c2026d706f13e250f351ae9070fc3c82b3cf3d"
     },
     {
       "path": "docs/motion.md",
@@ -201,10 +201,12 @@
     {
       "path": "docs/onboarding-ui-flow.mmd",
       "sha256": "52841ce7f73c66f13f7a16d9ee2f0872053f792050376bc629d3bf1e29aae581"
-    },
+    }
+  ],
+  "test_files": [
     {
-      "path": "docs/redesign-direction.svg",
-      "sha256": "ff36cd4e62c8dfe7faedf1e3f9044efda590a10557172f12471867457922eaf7"
+      "path": "tests/ui.spec.mjs",
+      "sha256": "53fdc54e1aadf5f9d3f32b95c24fb57f2038e3f4e8fe533a3af11f36565d98bc"
     }
   ]
 }

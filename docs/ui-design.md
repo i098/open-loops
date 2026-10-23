@@ -1,6 +1,6 @@
 # Open Loops — anchored companion and card platform
 
-This direction supersedes the earlier pocket/header-rail anatomy and the old `redesign-direction.svg`. Final visual evidence must name the revision it depicts; older placement screenshots are not proof of this contract. Native behavior remains a proposal; the HTML is a single-DOM browser simulation.
+This direction supersedes the earlier pocket/header-rail anatomy; the obsolete diagram is not included. Final visual evidence must name the revision it depicts; older placement screenshots are not proof of this contract. Native behavior remains a proposal; the HTML is a single-DOM browser simulation.
 
 ## Placement and object identity
 

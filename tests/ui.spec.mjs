@@ -454,6 +454,7 @@ test.describe('narrow touch surface', () => {
     await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
     await expectXP(page, 0);
     await close(page).tap();
+    await expect(dialog(page)).toBeHidden();
     await page.getByRole('button', { name: /^Open Open Loops/ }).tap();
     await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Unmute sounds' })).toHaveAttribute(
