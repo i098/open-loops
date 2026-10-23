@@ -1,0 +1,155 @@
+name: Quality and preview delivery
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    name: Detect changed inputs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      format: ${{ steps.scope.outputs.format }}
+      lint: ${{ steps.scope.outputs.lint }}
+      code_lint: ${{ steps.scope.outputs.code_lint }}
+      docs_lint: ${{ steps.scope.outputs.docs_lint }}
+      test: ${{ steps.scope.outputs.test }}
+      sentrux: ${{ steps.scope.outputs.sentrux }}
+      bundle: ${{ steps.scope.outputs.bundle }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - id: scope
+        run: node scripts/ci-scope.mjs
+
+  format:
+    name: Format
+    needs: detect
+    if: needs.detect.outputs.format == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run format:check
+
+  lint:
+    name: Lint
+    needs: detect
+    if: needs.detect.outputs.lint == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - if: needs.detect.outputs.code_lint == 'true'
+        run: npm run lint:code
+      - if: needs.detect.outputs.docs_lint == 'true'
+        run: npm run lint:docs
+
+  test:
+    name: Browser and CI behavior
+    needs: detect
+    if: needs.detect.outputs.test == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:ui
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: failure()
+        with:
+          name: browser-failure-${{ github.run_id }}
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  sentrux:
+    name: Sentrux
+    needs: detect
+    if: needs.detect.outputs.sentrux == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libgtk-3-0 libssl3
+      - run: node scripts/sentrux-check.mjs
+
+  gate:
+    name: PR gate
+    if: always()
+    needs: [detect, format, lint, test, sentrux]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: node scripts/check-gate.mjs
+        env:
+          CHECK_RESULTS: ${{ toJSON(needs) }}
+
+  delivery:
+    name: Downloadable preview bundle
+    needs: [detect, gate]
+    if: github.event_name == 'workflow_dispatch' || (needs.detect.outputs.bundle == 'true' && (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - run: node scripts/bundle.mjs
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: open-loops-preview-${{ github.sha }}
+          path: dist/open-loops-preview.tar.gz
+          if-no-files-found: error
+          retention-days: 30
