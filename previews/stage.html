@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Open Loops: companion and backend</title>
+    <style>
+      body {
+        margin: 0;
+        display: grid;
+        grid-template-columns: 560px 1fr;
+        height: 100vh;
+        background: #e4e9e6;
+      }
+      iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+      }
+      iframe + iframe {
+        border-left: 1px solid #d4dbd6;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="app" src="/open-loops.html" title="Open Loops companion"></iframe>
+    <iframe id="backend" src="/backend" title="Open Loops backend"></iframe>
+  </body>
+</html>
