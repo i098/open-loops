@@ -35,7 +35,7 @@ It reads those loops from a Snowflake view, has Claude turn each into one card (
 
 Diagram and run steps: [README](README.md#what-it-does).
 
-Verified live on Oct 23: the demo run read 10 evidence rows from the hackathon Snowflake account and journaled 12 events (10 card packs, 1 snooze, 1 accepted job) back to `LOOP_JOURNAL`.
+Verified live on Oct 23: the recorded run read 10 evidence rows from the hackathon Snowflake account over the SQL API, and every card pack, snooze and accepted job was written back to `LOOP_JOURNAL` (24 rows after two runs, 0 failed writes).
 
 ## (f) Build story
 
