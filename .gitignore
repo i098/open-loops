@@ -1,0 +1,60 @@
+# Local credentials and environment. Safe templates may be tracked.
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+credentials.json
+credentials.*.json
+secrets.json
+secrets.*.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.mobileprovision
+/secrets/
+/.secrets/
+
+# Dependency and generated build outputs; keep source and lockfiles.
+node_modules/
+/target/
+/src-tauri/target/
+/dist/
+/build/
+/coverage/
+/.cache/
+/src-tauri/gen/schemas/
+/test-results/
+/playwright-report/
+/.sentrux/cache.bin
+/.sentrux/baseline.json
+
+# Private runtime state and local capture/debug material.
+/.local/
+/private/
+/captures/
+/recordings/
+/logs/
+/tmp/
+/runtime-data/
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
+*.db-wal
+*.db-shm
+*.log
+*.crash
+
+# Host/editor noise.
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Deliberately do not ignore HTML, Markdown, Mermaid, SVG, screenshots,
+# source-plan snapshots, or the application dependency lockfiles.
