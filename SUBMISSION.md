@@ -35,6 +35,8 @@ It reads those loops from a Snowflake view, has Claude turn each into one card (
 
 Diagram and run steps: [README](README.md#what-it-does).
 
+Verified live on Oct 23: the demo run read 10 evidence rows from the hackathon Snowflake account and journaled 12 events (10 card packs, 1 snooze, 1 accepted job) back to `LOOP_JOURNAL`.
+
 ## (f) Build story
 
 The companion UI, its interaction tests and the native Tauri plan were built before the event with Claude Code and Codex, under a CI gate (format, lint, 9 Playwright interaction tests, Sentrux structure check). At the hackathon, Claude Code (Opus) read the event rules and the technical resource guide, then wrote the live server, the Snowflake SQL API client, the Claude card-pack validator, contract tests for both APIs (including a mutation check that the verbatim-quote guard actually fails when removed), the Snowflake setup script and this write-up. The demo video was recorded headless by a record-demo recipe that waits for the real Claude result before it will publish a take.

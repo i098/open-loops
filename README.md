@@ -11,7 +11,7 @@ https://github.com/i098/open-loops/raw/main/docs/media/open-loops-live.mp4
 
 [![Live run: scan, Claude card, evidence, accept, cited summary](docs/media/open-loops-live.webp)](docs/media/open-loops-live.mp4)
 
-_Recorded from the real flow: `npm run live`, live Claude calls, recorded headless with [record-demo](demos/live-flow.mjs)._
+_Recorded from the real flow against the hackathon Snowflake account: `npm run live` read 10 evidence rows from `OPEN_LOOPS.PUBLIC.LOOP_EVIDENCE` through the SQL API, Claude wrote the cards and the draft, and the run wrote `card_pack`, `snoozed` and `accepted_job` rows back to `LOOP_JOURNAL`. Recorded headless with [record-demo](demos/live-flow.mjs)._
 
 Built at the [Intelligence at Work Hackathon](https://cerebralvalley.ai/e/intelligence-at-work-hackathon) (Snowflake + Anthropic, Menlo Park, Oct 23 2026). Submission write-up: [SUBMISSION.md](SUBMISSION.md).
 
