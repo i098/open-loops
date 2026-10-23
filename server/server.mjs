@@ -6,8 +6,22 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { snowflakeConfig, fetchEvidence, groupLoops, journal } from './snowflake.mjs';
-import { claudeConfig, cardPack, runJob } from './claude.mjs';
+import {
+  snowflakeConfig,
+  fetchEvidence,
+  groupLoops,
+  journal,
+  runStatement,
+  queryLog,
+} from './snowflake.mjs';
+import {
+  claudeConfig,
+  cardPack,
+  runJob,
+  cortexConfig,
+  cortexCardPack,
+  cortexRunJob,
+} from './claude.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const previews = join(root, 'previews');
@@ -23,7 +37,16 @@ const types = {
 };
 
 const sf = snowflakeConfig(),
+  cortex = sf && cortexConfig(),
   claude = claudeConfig();
+// With Snowflake connected, Claude runs inside Cortex (AI_COMPLETE); otherwise the Anthropic API.
+const makePack = (loop, signal, picks) =>
+  cortex
+    ? cortexCardPack(sf, runStatement, cortex.model, loop, picks)
+    : cardPack(claude, loop, { signal });
+const makeJob = (loop, brief) =>
+  cortex ? cortexRunJob(sf, runStatement, cortex.model, loop, brief) : runJob(claude, loop, brief);
+const modelLabel = cortex ? `${cortex.model} via Snowflake Cortex` : claude?.model || null;
 const loops = new Map(); // LOOP_ID -> loop with evidence, from the latest scan
 const usage = { input_tokens: 0, output_tokens: 0, calls: 0 };
 let evidenceLabel = sf
@@ -114,17 +137,31 @@ async function scan(req, res) {
     !ac.signal.aborted &&
     res.write(`id: ${++seq}\nevent: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
   try {
-    if (!claude) throw Error('No Claude credential: set ANTHROPIC_API_KEY (or CORTEX_GATEWAY_PAT)');
+    if (!cortex && !claude)
+      throw Error('No Claude route: connect Snowflake (Cortex) or set ANTHROPIC_API_KEY');
     send('status', { text: `Reading ${sf ? 'Snowflake' : 'demo'} evidence` });
     const found = await loadEvidence();
     found.forEach((l) => loops.set(l.LOOP_ID, l));
-    send('status', { text: `${found.length} open loops found · asking Claude` });
+    // Learn from picks: the last accepted actions, read back from the journal, steer the next cards.
+    let picks = '';
+    if (sf) {
+      const { rows } = await runStatement(
+        sf,
+        "SELECT LOOP_ID, DETAIL:action::STRING AS ACTION FROM LOOP_JOURNAL WHERE EVENT = 'accepted_job' AND DETAIL:action IS NOT NULL ORDER BY AT DESC LIMIT 6",
+      ).catch(() => ({ rows: [] }));
+      picks = rows.map((r) => `- ${r.LOOP_ID}: ${r.ACTION}`).join('\n');
+      if (rows.length)
+        send('status', { text: `${rows.length} past picks loaded from LOOP_JOURNAL` });
+    }
+    send('status', {
+      text: `${found.length} open loops found · asking ${cortex ? 'Claude in Snowflake Cortex' : 'Claude'}`,
+    });
     let ready = 0,
       failed = 0;
     await Promise.all(
       found.map(async (loop) => {
         try {
-          const { pack, usage: u, model } = await cardPack(claude, loop, { signal: ac.signal });
+          const { pack, usage: u, model } = await makePack(loop, ac.signal, picks);
           track(u);
           remember(loop.LOOP_ID, 'card_pack', model, pack);
           ready++;
@@ -160,18 +197,46 @@ async function body(req) {
 
 async function run(req, res) {
   try {
-    const { record, brief } = await body(req);
+    const { record, brief, action } = await body(req);
     const loop = loops.get(record);
     if (!loop) throw Error('Unknown loop; run a scan first');
     if (typeof brief !== 'string' || !brief.trim() || brief.length > 900)
       throw Error('Invalid brief');
-    const out = await runJob(claude, loop, brief);
+    const out = await makeJob(loop, brief);
     track(out.usage);
-    remember(record, 'accepted_job', out.model, { brief, result: out.text, usage: out.usage });
+    remember(record, 'accepted_job', out.model, {
+      action: typeof action === 'string' ? action.slice(0, 120) : null,
+      brief,
+      result: out.text,
+      usage: out.usage,
+    });
     json(res, 200, { text: out.text, model: out.model, usage: out.usage });
   } catch (err) {
     json(res, 400, { error: err.message.slice(0, 200) });
   }
+}
+
+const JOURNAL_VIEW =
+  "SELECT TO_VARCHAR(AT, 'HH24:MI:SS') AS AT, LOOP_ID, EVENT, MODEL, LEFT(COALESCE(DETAIL:headline::STRING, DETAIL:action::STRING, 'returns ' || DETAIL:due_at::STRING, TO_VARCHAR(DETAIL)), 90) AS DETAIL FROM LOOP_JOURNAL ORDER BY AT DESC LIMIT 14";
+let journalCache = { at: 0, rows: [] };
+async function backend(res) {
+  if (sf && Date.now() - journalCache.at > 2500) {
+    journalCache.at = Date.now();
+    try {
+      journalCache.rows = (await runStatement(sf, JOURNAL_VIEW)).rows;
+    } catch (err) {
+      journalCache.error = err.message.slice(0, 160);
+    }
+  }
+  json(res, 200, {
+    evidence: evidenceLabel,
+    model: modelLabel,
+    snowflake: Boolean(sf),
+    // The viewer's own journal polling is hidden so it doesn't flood the log.
+    queries: queryLog.filter((q) => !q.statement.startsWith("SELECT TO_VARCHAR(AT, 'HH24")),
+    journal: journalCache.rows,
+    journaled,
+  });
 }
 
 async function snooze(req, res) {
@@ -197,7 +262,7 @@ async function serveStatic(req, res, path) {
   try {
     let data = await readFile(file);
     if (path === '/open-loops.html') {
-      const live = JSON.stringify({ evidence: evidenceLabel, model: claude?.model || null });
+      const live = JSON.stringify({ evidence: evidenceLabel, model: modelLabel });
       data = data
         .toString()
         .replace(
@@ -217,10 +282,12 @@ const server = createServer((req, res) => {
   if (pathname === '/api/scan' && req.method === 'GET') return scan(req, res);
   if (pathname === '/api/run' && req.method === 'POST') return run(req, res);
   if (pathname === '/api/snooze' && req.method === 'POST') return snooze(req, res);
+  if (pathname === '/api/backend') return backend(res);
+  if (pathname === '/backend') return serveStatic(req, res, '/backend.html');
   if (pathname === '/api/status')
     return json(res, 200, {
       evidence: evidenceLabel,
-      model: claude?.model || null,
+      model: modelLabel,
       snowflake: Boolean(sf),
       usage,
       journaled,
@@ -233,6 +300,6 @@ server.listen(port, '127.0.0.1', () => {
   console.log(`Open Loops live on http://127.0.0.1:${port}/`);
   console.log(`  evidence: ${evidenceLabel}`);
   console.log(
-    `  claude:   ${claude ? `${claude.model} via ${claude.base}` : 'missing credential'}`,
+    `  claude:   ${cortex ? modelLabel : claude ? `${claude.model} via ${claude.base}` : 'missing credential'}`,
   );
 });

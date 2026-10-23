@@ -7,13 +7,20 @@ A desk buddy that finds the work you forgot to close. It reads stale requests, p
 ![Snowflake SQL API](https://img.shields.io/badge/Snowflake-SQL%20API%20v2-29B5E8)
 ![Claude](https://img.shields.io/badge/Claude-Messages%20API-D97757)
 
-https://github.com/i098/open-loops/raw/main/docs/media/open-loops-live.mp4
+[![Open Loops demo: problem, live Snowflake + Cortex run, architecture](docs/media/open-loops-preview.gif)](https://github.com/i098/open-loops/raw/main/docs/media/open-loops-demo.mp4)
 
-[![Live run: scan, Claude card, evidence, accept, cited summary](docs/media/open-loops-live.webp)](docs/media/open-loops-live.mp4)
-
-_Recorded from the real flow against the hackathon Snowflake account: `npm run live` read 10 evidence rows from `OPEN_LOOPS.PUBLIC.LOOP_EVIDENCE` through the SQL API, Claude wrote the cards and the draft, and the run wrote `card_pack`, `snoozed` and `accepted_job` rows back to `LOOP_JOURNAL`. Recorded headless with [record-demo](demos/live-flow.mjs)._
+**[Watch the 60-second demo with captions](https://github.com/i098/open-loops/raw/main/docs/media/open-loops-demo.mp4).** Recorded from a real run on the hackathon Snowflake account: the companion on the left, every Snowflake statement and the `LOOP_JOURNAL` table on the right.
 
 Built at the [Intelligence at Work Hackathon](https://cerebralvalley.ai/e/intelligence-at-work-hackathon) (Snowflake + Anthropic, Menlo Park, Oct 23 2026). Submission write-up: [SUBMISSION.md](SUBMISSION.md).
+
+## Claude runs inside Snowflake
+
+With Snowflake connected, every Claude call is a Cortex [`AI_COMPLETE`](https://docs.snowflake.com/en/sql-reference/functions/ai_complete) statement over the same SQL API connection (`claude-sonnet-5-5`), so evidence, model calls and the decision journal live in one governed account. Past picks are read back from the journal and steer the next scan's options. Without Snowflake, the server falls back to the Anthropic Messages API on demo data.
+
+- `/backend` shows each Snowflake statement as it runs and `LOOP_JOURNAL` filling in.
+- **Continue in Claude** opens claude.ai with the brief, the cited evidence and the draft prefilled. Nothing is sent from the app.
+- `macos/OpenLoopsBar.swift` is a menu bar item with the latest journal events and shortcuts to the companion and backend (`swiftc -parse-as-library -O macos/OpenLoopsBar.swift -o macos/OpenLoopsBar`).
+- The companion works at phone widths; the UI tests cover 320 and 390px.
 
 ## What it does
 
