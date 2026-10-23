@@ -1366,6 +1366,14 @@
       drag.card.style.transform = `translateX(${visual}px) rotate(${reduced() ? 0 : Math.max(-5, Math.min(5, dx / 24))}deg)`;
     });
   });
+  // Prevent phantom fling from consuming the next tap: https://issues.chromium.org/issues/407890253
+  body.addEventListener(
+    'touchmove',
+    (e) => {
+      if (drag?.locked && e.touches.length === 1 && e.cancelable) e.preventDefault();
+    },
+    { passive: false },
+  );
   function endDrag(e, cancel = false) {
     if (!drag || drag.id !== e.pointerId) return;
     const d = drag;
@@ -1387,28 +1395,7 @@
       delete d.card.dataset.direction;
       return;
     }
-    const side = d.dx < 0 ? 'snooze' : 'act';
-    if (e.pointerType !== 'touch') {
-      chooseSide(side, e, true);
-      return;
-    }
-    const quest = current,
-      from = view;
-    // Keep the touched node connected through native touchend dispatch.
-    requestAnimationFrame(() => {
-      if (
-        !open ||
-        current !== quest ||
-        view !== from ||
-        !d.card.isConnected ||
-        body.querySelector('#swipe-card') !== d.card
-      ) {
-        d.card.style.transform = '';
-        delete d.card.dataset.direction;
-        return;
-      }
-      chooseSide(side, e, true);
-    });
+    chooseSide(d.dx < 0 ? 'snooze' : 'act', e, true);
   }
   body.addEventListener('pointerup', (e) => endDrag(e));
   body.addEventListener('pointercancel', (e) => endDrag(e, true));

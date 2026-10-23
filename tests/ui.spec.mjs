@@ -482,6 +482,7 @@ async function captureTouchEvents(page) {
       'pointerup',
       'pointercancel',
       'touchstart',
+      'touchmove',
       'touchend',
       'click',
       'gotpointercapture',
