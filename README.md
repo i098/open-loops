@@ -7,9 +7,9 @@ A desk buddy that finds the work you forgot to close. It reads stale requests, p
 ![Snowflake SQL API](https://img.shields.io/badge/Snowflake-SQL%20API%20v2-29B5E8)
 ![Claude](https://img.shields.io/badge/Claude-Messages%20API-D97757)
 
-[![Open Loops demo: problem, live Snowflake + Cortex run, architecture](docs/media/open-loops-preview.gif)](https://github.com/i098/open-loops/raw/main/docs/media/open-loops-demo.mp4)
+[![Open Loops demo: problem, live Snowflake + Cortex run, architecture](docs/media/open-loops-preview.gif)](https://open-loops-demo.vercel.app)
 
-**[Watch the 60-second demo with captions](https://github.com/i098/open-loops/raw/main/docs/media/open-loops-demo.mp4).** Recorded from a real run on the hackathon Snowflake account: the companion on the left, every Snowflake statement and the `LOOP_JOURNAL` table on the right.
+**[Watch the 60-second demo with captions](https://open-loops-demo.vercel.app).** Recorded from a real run on the hackathon Snowflake account: the companion on the left, every Snowflake statement and the `LOOP_JOURNAL` table on the right.
 
 Built at the [Intelligence at Work Hackathon](https://cerebralvalley.ai/e/intelligence-at-work-hackathon) (Snowflake + Anthropic, Menlo Park, Oct 23 2026). Submission write-up: [SUBMISSION.md](SUBMISSION.md).
 

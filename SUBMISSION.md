@@ -51,7 +51,7 @@ Owner after today: the ops lead for one queue (IT requests is the easiest start,
 
 ## (i) One-minute demo video
 
-[docs/media/open-loops-demo.mp4](https://github.com/i098/open-loops/raw/main/docs/media/open-loops-demo.mp4)
+[docs/media/open-loops-demo.mp4](https://open-loops-demo.vercel.app)
 
 ## (j) Partner tools used
 
