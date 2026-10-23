@@ -2,11 +2,13 @@
 
 ## Current publication state
 
-The user authorized commits, private GitHub publication, CI/CD, and required PR checks after the initial documentation-only checkpoint. Earlier no-commit/no-push restrictions no longer apply to this publication workstream. Destructive history changes, public disclosure, native releases, and unapproved source writes remain outside scope.
+The user authorized commits, GitHub publication, CI/CD, and required PR checks after the initial documentation-only checkpoint. Private visibility was the initial default. Earlier no-commit/no-push restrictions no longer apply. Destructive history changes, visibility mutations, native releases, and unapproved source writes remain outside this workstream.
 
-Authenticated GitHub user: `i098`. `repos/i098/open-loops` initially returned HTTP 404. The new [i098/open-loops](https://github.com/i098/open-loops) repository was created **private**, its visibility was confirmed, and local `origin` is `https://github.com/i098/open-loops.git`. No unrelated existing repository was reused. Final source synchronization, local checks, first push, Actions verification, and branch protection are still pending at this checkpoint.
+Authenticated GitHub user: `i098`. `repos/i098/open-loops` initially returned HTTP 404. [i098/open-loops](https://github.com/i098/open-loops) was created private; origin is `https://github.com/i098/open-loops.git`. Documentation bootstrap `dd4ff34` is on main. [Draft PR #1](https://github.com/i098/open-loops/pull/1) contains the previews, plans, tests, and CI on `feat/verified-previews-ci`; it is not merged. A later raw API read returned `private: false`, `visibility: public`. This unexpected external visibility change was reported and preserved. Publication continued under the original GitHub authorization; this workstream did not change visibility. No unrelated repository was reused.
 
 The actual application deliverable is a **browser prototype plus plans**, not a Tauri application. CI must not invent a Cargo build for absent native sources.
+
+Before adding native Rust/Swift implementation, extend path selection and jobs with its real build, formatter/linter, tests, and packaging checks. Current browser-only gates must not silently become the complete native quality policy.
 
 ## Repository conventions
 
@@ -24,18 +26,18 @@ Inline application JS/CSS must be extracted into repo-local files so ESLint and 
 
 The workflow starts on every PR, every main push, and manual dispatch. There is **no top-level `paths` or `paths-ignore` filter** that can leave a required check pending.
 
-| Changed input                                                                                             | Format                                | Lint          | Browser / policy tests | Sentrux                   |
-| --------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------- | ---------------------- | ------------------------- |
-| Workflow, scripts, lockfile/package, Node version, lint/format/test/Sentrux config, Git ignore/attributes | Run                                   | Code and docs | Run                    | Run                       |
-| Application HTML / JS / CSS                                                                               | Run                                   | Code          | Run                    | Run                       |
-| Tests                                                                                                     | Run for supported text                | Code for JS   | Run                    | Run for source extensions |
-| Markdown docs only                                                                                        | Run                                   | Markdown only | Skip                   | Skip                      |
-| Preview SVG/image asset only                                                                              | Skip if formatter does not support it | Skip          | Run                    | Skip                      |
-| Review screenshot or unrelated binary only                                                                | Skip                                  | Skip          | Skip                   | Skip                      |
+| Changed input                                                                                             | Format                 | Lint          | Browser / policy tests | Sentrux                   |
+| --------------------------------------------------------------------------------------------------------- | ---------------------- | ------------- | ---------------------- | ------------------------- |
+| Workflow, scripts, lockfile/package, Node version, lint/format/test/Sentrux config, Git ignore/attributes | Run                    | Code and docs | Run                    | Run                       |
+| Application HTML / JS / CSS                                                                               | Run                    | Code          | Run                    | Run                       |
+| Tests                                                                                                     | Run for supported text | Code for JS   | Run                    | Run for source extensions |
+| Markdown docs only                                                                                        | Run                    | Markdown only | Skip                   | Skip                      |
+| Preview SVG/image asset only                                                                              | SVG: run; binary: skip | Skip          | Run                    | Skip                      |
+| Review screenshot or unrelated binary only                                                                | Skip                   | Skip          | Skip                   | Skip                      |
 
 JSON and YAML are parsed by Prettier as part of the format check. ESLint checks actual JS for undefined names and unsafe/invalid constructs. HTML validation checks structure/duplicate IDs and attributes; Stylelint checks CSS syntax/invalid properties and values. Markdownlint checks heading progression, fenced-code language/spacing, and empty links. These are focused correctness rules, not a claim of complete accessibility or security analysis.
 
-The path detector reads actual Git base/head changes using `git diff --name-only -z`; the initial main push or manual dispatch with no base considers all tracked files. Renames/deletions are conservative: both affected paths may trigger checks. The detector and final gate have executable behavior tests; workflow YAML is parsed into a semantic model for policy assertions.
+The path detector reads Git base/head changes using `git diff --no-renames --name-only -z`; the initial main push or manual dispatch with no base considers all tracked files. A rename includes both the removed source path and its destination so an extension change cannot hide relevant code. Executable tests exercise a real temporary Git rename, path selection, and gate outcomes. Workflow YAML is parsed and its delivery condition executed against main/feature/PR/dispatch cases, not merely compared as text.
 
 ## Stable required gate
 
@@ -47,11 +49,11 @@ Job name: **`PR gate`**. It depends on `detect`, `format`, `lint`, `test`, and `
 - Docs-only PRs still receive the stable gate, while unnecessary browser/Sentrux work skips.
 - Main delivery depends on gate success. No `continue-on-error`, warning-only Sentrux, or fake successful fallback is permitted.
 
-Configure branch protection to require `PR gate` after the initial commit/run exists, when the account/repository supports protection. Confirm the API response and effective rule; a local YAML file does not establish protection. If GitHub's plan restricts private-repository protection, report the exact API error instead of claiming it was installed.
+The earlier private-repository protection attempt returned HTTP 403 requiring GitHub Pro or public visibility. After the externally changed visibility cleared that condition, an authorized GET found main unprotected (HTTP 404). The minimal protection policy was then applied and verified by GET: exact required context **`PR gate`**, strict up-to-date checks, enforced for administrators, and pull requests required with **zero human approvals**. No code-owner or extra reviewer policy was added. Force pushes and deletions are disabled. The prior private-repository entitlement blocker is historical; required-gate enforcement is now active. No visibility change or auto-merge was performed.
 
 ## Untrusted PRs and pins
 
-The workflow uses `pull_request`, never `pull_request_target`. It grants only `contents: read`, persists no checkout credentials, and uses no repository secrets. Fork code receives no publication token. Delivery is limited to a successful **main push**, not a fork PR. Action code is pinned to real commits fetched through the GitHub API:
+The workflow uses `pull_request`, never `pull_request_target`. It grants only `contents: read`, persists no checkout credentials, and uses no repository secrets. Fork code receives no publication token. Successful main pushes produce continuous-delivery artifacts only when packaged inputs change; successful PRs produce review artifacts under the same input condition. Neither is a hosted deployment. Action code is pinned to real commits fetched through the GitHub API:
 
 | Action                    | Fetched ref | Immutable commit                           |
 | ------------------------- | ----------- | ------------------------------------------ |
@@ -75,7 +77,7 @@ The research worker proved why a naive check is unsafe:
 | `gate` without a baseline                                     | Exit 1; no automatic successful baseline                                                                              |
 | `gate --save`, then unchanged gate                            | Explicit baseline save succeeds; unchanged comparison succeeds                                                        |
 
-These experiments establish the tool behavior, **not final application acceptance**. The source owner is handling the measured render-complexity issue before final readiness. No threshold increase or artificial baseline is authorized to conceal it.
+These experiments establish tool behavior. Final browser source now passes the strict rules without raising thresholds or creating an artificial baseline; the final observed counts and score are recorded below.
 
 The CI runner must obtain the exact pinned binary and JavaScript grammar, disable telemetry before invoking it, require nonempty extracted application JS, and fail if source coverage is empty. Rules retain `max_cycles = 0`, `max_cc = 25`, and `max_fn_lines = 100`; actual final findings must be resolved or reported. Do not create/save a PR baseline and call it regression protection.
 
@@ -88,11 +90,11 @@ grammars-linux-x86_64.tar.gz
 8849f1eb07df3f6d4ea1ed422d8dee4b9b79a250682fa5646675dae466554454
 ```
 
-Do not execute upstream `install.sh`: even at this tag, it discovers `releases/latest` and installs globally. Use checked release bytes in isolated tool storage instead. The dedicated research note will supply the final exact runner recipe. No license/authentication blocker was observed with a clean tool home.
+Do not execute upstream `install.sh`: even at this tag, it discovers `releases/latest` and installs globally. `scripts/sentrux-check.mjs` instead verifies pinned release bytes, uses an isolated temporary HOME with telemetry opt-out, installs the matching JavaScript grammar, copies actual application/tooling JS into a source-only tree, and requires the pinned scanner's reported count to match. Linux uses Ubuntu 22.04 with GTK/OpenSSL shared libraries (`libgtk-3-0`, `libssl3`); no display is needed. Sentrux passed on the actual hosted Linux run linked below, without a license/authentication blocker.
 
 ## Continuous delivery, not assumed hosting
 
-After a successful main-push gate, `scripts/bundle.mjs` creates `dist/open-loops-preview.tar.gz`. It contains the verified preview files, approved docs, and a per-file SHA-256 manifest bound to the GitHub commit. The workflow uploads this as `open-loops-preview-<commit>` for **30 days**.
+After a successful gate on main, `scripts/bundle.mjs` creates `dist/open-loops-preview.tar.gz` only when packaged inputs change. It contains verified preview files, approved docs, and a per-file SHA-256 manifest bound to the GitHub commit. The workflow uploads `open-loops-preview-<commit>` for **30 days**. PRs produce the same review bundle when previews, packaged docs/README/PLAN, or build/workflow inputs change. Unrelated Markdown outside the bundle does not trigger rebuild. Manual dispatch is an explicit override once the workflow exists on the default branch.
 
 This is an actual downloadable artifact, not an unconfigured deployment promise. It is **continuous delivery of the browser preview**. No Pages URL, native installer, public website, or GitHub Release is claimed. Pages may be considered later only if private-repository/account capabilities and intended audience are verified. GitHub Actions artifact access follows repository permissions; public disclosure is not the default.
 
@@ -115,4 +117,18 @@ npm install --ignore-scripts
 
 Observed: user `i098`; initial repository 404; created repository confirmed private; Sentrux 0.5.7; 249 npm packages installed. No credentials were written to repository docs. Initial npm engine warning reflected Node26 versus the first proposed strict Node24 range; package support now allows Node24 and newer while CI remains on Node24.
 
-Final local formatting/lint, policy tests, transformed-copy browser tests, nonempty-source Sentrux, archive build, exact commit/push, GitHub run conclusions, artifact download, and protection API results are **not yet recorded**. Replace this pending section with actual results after `FINAL-READY`, not predictions.
+Final companion source is `8355703b732dfbe9126e824283bd1ea9583247c641885b4ef4f26e8b9ef157d1`; dashboard source is `ed789a3d7d6eebe6a50758efd06beae2cc28b8f84aadabbb49ada8b284dac7ac`. The final change synchronizes inert native-plan text and diagrams; extracted application JS/CSS remain unchanged from the proven input fix. All 9 local browser paths, 13 policy/import tests, formatter/lint, strict Sentrux and bundling pass. Exact local results/hashes are in [local checks](verification/local-checks.md) and [snapshot](verification/snapshot.json); hosted results below were observed separately.
+
+## Hosted execution receipts
+
+The first [hosted run 40022399641](https://github.com/i098/open-loops/actions/runs/40022399641) completed with failure: Detect, Format, Lint, and Sentrux passed; browser/policy job failed on one of nine browser tests; `PR gate` failed and preview delivery correctly skipped. The [failure trace artifact](https://github.com/i098/open-loops/actions/runs/40022399641/artifacts/12530638418) is diagnostic evidence, not a delivered preview.
+
+The initial hidden-dialog wait exposed missing native click delivery rather than resolving it. Keeping the CDP session attached and deferring touched-node replacement also did not resolve it. Telemetry then matched [Chromium issue 407890253](https://issues.chromium.org/issues/407890253): a rapid swipe can create a phantom fling, consuming the next tap without generating a click even under restrictive `touch-action`. The final app cancels native `touchmove` only after horizontal drag lock, for one touch and a cancelable event. Vertical scrolling before lock, multitouch, and ordinary taps keep their defaults. No synthetic click, forced action, sleep, skipped test, or added retry was introduced. Temporary diagnostics were removed after hosted proof.
+
+### Successful full run and artifact
+
+[Run 40026691480](https://github.com/i098/open-loops/actions/runs/40026691480) completed successfully for diagnostic-free PR head `5dbfefd60d5730fa71c64d83b781be9f6800b47c`: Detect, Format, Lint, Browser and CI behavior (9 browser paths and 13 policy/import tests), Sentrux, `PR gate`, and Downloadable preview bundle all succeeded.
+
+[Artifact 12533471126](https://github.com/i098/open-loops/actions/runs/40026691480/artifacts/12533471126), `open-loops-preview-092fac65d364947f69f7d2d5be0de52a958d4725`, was uploaded only after the gate. It is 832042 bytes and expires 2026-11-22. GitHub's artifact ZIP digest is `sha256:fb8747fe80a45c4bb2165929620f16864d857f4d9e07c09c53912f431b8c4a82`.
+
+The downloaded archive was opened and all 31 manifest file hashes matched. Its manifest commit is the PR merge-ref commit `092fac65d364947f69f7d2d5be0de52a958d4725`, not the branch-head SHA. The subsequent native-plan expansion changes documentation and inert in-preview plan text only; current-head checks remain visible on the [PR](https://github.com/i098/open-loops/pull/1/checks). No native implementation or live API request is inferred from this preview proof.

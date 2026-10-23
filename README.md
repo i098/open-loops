@@ -1,85 +1,79 @@
 # Open Loops
 
-Read [PLAN.md](PLAN.md) for the product contract, Mermaid architecture and onboarding flows, implementation sequence, and acceptance gates.
+Run the browser previews from this directory:
 
-A quiet macOS companion that turns office loose ends into numbered decisions and explicitly approved, scoped agent work. A swipe is navigation, not permission. Acceptance earns companion XP; only authoritative source readback proves a business outcome.
+```sh
+python3 -m http.server 4173 --directory previews
+```
 
-## Current status — planning checkpoint
+Open [the companion](http://127.0.0.1:4173/open-loops.html) or [My day](http://127.0.0.1:4173/personal-observability.html). The companion's **Design & architecture** view contains the Mermaid proposal. The previews use pinned external style/diagram libraries, so allow internet access for those assets.
 
-**This repository contains plans, not a working native application.** The browser prototype is being revised outside this repository. Its final source and evidence snapshot is pending an explicit `FINAL-READY` signal.
+**Browser prototypes plus plans, not a working native app.** Records, scans, demo jobs, and source receipts are synthetic. There are no Snowflake/model API/native integrations. Explicit Copy/Open actions only copy the reviewed prompt and open a fixed Claude or Codex page for manual paste; they never submit or execute it. External tools retain their own permissions; the proposed app sandbox cannot control them or guarantee a run or completion.
 
-| Deliverable                                                                         | Status                                                                                                   |
-| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Isolated Git repository, README, PLAN, secret/build ignore rules                    | Created in this checkpoint; not staged or committed                                                      |
-| Browser companion prototype                                                         | Exists at the canonical source path below; latest UX/onboarding revisions are in flight; not copied here |
-| Personal observability / My day browser dashboard                                   | In flight; not copied or independently verified here                                                     |
-| Tauri v2 host, Swift helper, SQLite, Keychain, Snowflake, Claude/GPT, source writes | Planned; unimplemented in this repository                                                                |
-| Native permissions, signed packaging, real background jobs, real reminders          | Planned; no runtime or verification claim                                                                |
+## What this is
 
-Older 61-check reports and older screenshots describe an earlier design. They are **not evidence for the latest companion, onboarding, Tauri proposal, or dashboard**. New verification must identify the exact final files it exercised.
+A quiet macOS companion that turns office loose ends into numbered decisions and explicitly scoped agent work. The actual card has a 5:7 poker ratio with circular red-X/green-check actions and no shadows. A swipe is navigation, not permission. Acceptance earns companion XP; authoritative source readback alone proves a business outcome.
 
-## Repository contents
+- **Companion:** a positionable buddy, an independent info card always below the displayed buddy, and a separately positioned 5:7 decision deck. Near the bottom edge, order is deck including circular actions, buddy, info; only the info card follows an open buddy drag. Includes progressive scripted first-scan activity, precomputed choices, a prefilled prompt editor, explicit handoff/approval, and Pip/Scout/Guide progression. Placement is browser-session state, not a native integration.
+- **My day:** separate example timeline, filters, agent outcomes, and memory provenance. Observed, inferred, and demo records are distinct.
+- **Target native product:** Tauri v2/macOS system WKWebView, Rust-owned jobs/state, SQLite/FTS, and Keychain credentials. The selected live stack is **Snowflake SQL API + Anthropic Claude Messages API**, not a provider-choice framework. The [implementation contract](docs/implementation-plan.md) specifies protocols, schemas, transactions, command permissions, and ordered native acceptance gates. Optional Swift AX/ScreenCaptureKit context remains separately gated. These integrations are planned, not implemented; Chromium is only the browser-preview test engine.
 
-- [PLAN.md](PLAN.md): consolidated decisions, data ownership, command boundaries, four-hour vertical slice, and later integration gates.
-- [.gitignore](.gitignore): local secrets, runtime data, captures/logs, dependencies, and build outputs. Source previews and plans remain trackable.
-- Final prototype, sprite, source-plan snapshots, and verification artifacts: pending; no placeholder files or application scaffold were created.
+## Plans and evidence
 
-## Canonical sources awaiting final snapshot
+| Read                                                    | Contents                                                                                |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| [PLAN.md](PLAN.md)                                      | Product decisions, four-hour development slice, and implementation gates                |
+| [Architecture](docs/architecture.md)                    | Canonical Mermaid architecture, async runtime, and onboarding tree                      |
+| [UI design](docs/ui-design.md)                          | Full-size portrait cards, external Back/info Close, gestures, and first-run behavior    |
+| [Implementation reference](docs/implementation-plan.md) | File/module sequence, data ownership, command validation, memory/privacy, and packaging |
+| [CI and publication](docs/CI.md)                        | Path-aware checks, actual Sentrux findings, artifact delivery, and protection limits    |
 
-These paths are external working sources, not files delivered inside this repository yet:
+Source imports extract inline JS/CSS into `previews/assets/` for real analysis. They are **not byte-identical copies** of the original HTML. [Source hashes and transformations](docs/verification/snapshot.json) and [local-check receipts](docs/verification/local-checks.md) must identify the exact revision they cover. This page makes no final-pass claim; the older 61-check report is not current proof.
 
-| Source                                                   | Role                                                                  |
-| -------------------------------------------------------- | --------------------------------------------------------------------- |
-| `/Users/xiao/tmp/.lavish/open-loops.html`                | Browser companion prototype; ongoing edits                            |
-| `/Users/xiao/tmp/.lavish/redesign-direction.md`          | Latest card, navigation, visual, gesture, and first-run specification |
-| `/Users/xiao/tmp/.lavish/screen-context-architecture.md` | Tauri/native ownership, runtime, and Mermaid proposal                 |
-| `/Users/xiao/tmp/.lavish/quest-sprite.svg`               | Original Pip / Scout / Guide sprite asset                             |
-| `/Users/xiao/tmp/.lavish/personal-observability.html`    | Pending separate My day prototype                                     |
+## Development checks
 
-The existing `/Users/xiao/tmp/.lavish/crewship-skills-report.md` records installed-skill provenance. The existing `onboarding-ui-flow.mmd` is a supporting working diagram; its final role will be reconciled at snapshot time.
+These commands reproduce the verified Node 24 CI toolchain. Local preference is Bun (`bun run <script>`, `bunx <tool>`) with the already pinned dependencies; no CI/lockfile migration is implied.
 
-### Final snapshot protocol
+```sh
+npm ci --ignore-scripts
+npm run format:check
+npm run lint
+npm test
+npx playwright install chromium
+npm run test:ui
+npm run check:sentrux
+npm run bundle
+```
 
-1. Receive `FINAL-READY` with the exact verified source, sprite, dashboard, and evidence filenames.
-2. Copy only that approved set into this repository; preserve relative asset references and distinguish current evidence from historical reports.
-3. Record source-to-destination paths and byte hashes. Check links, dependency paths, and documented status against the copied bytes.
-4. Update this status table and PLAN's handoff section. Then validate and publish to the authorized private GitHub repository. Do not modify the external working originals.
+The browser suite exercises rendered interactions, not source-text markers. Sentrux uses the genuine pinned 0.5.7 binary and grammar, strict rules, and positive application-JS coverage. The bundle is `dist/open-loops-preview.tar.gz` with a SHA-256 manifest; its preview server command is the same Python command above.
 
-No startup command is advertised yet: no application was scaffolded, and the final browser files have not been copied.
+## GitHub and current delivery boundary
 
-## Decisions that are settled
+Repository: [i098/open-loops](https://github.com/i098/open-loops). [Draft PR #1](https://github.com/i098/open-loops/pull/1) publishes the verified previews and plans from `feat/verified-previews-ci`; it is not merged. The repository was created private, but a later API read returned `private: false`, `visibility: public`. That unexpected external change was reported and preserved; this workstream did not change visibility. No automatic merge or hosted deployment is authorized.
 
-- **Tauri v2 on macOS, not Electron.** Local HTML/CSS/JS runs in the system WebView; Rust owns privileged behavior and durable state.
-- Snowflake supplies scoped read-only office evidence. One approved Claude **or** GPT provider prepares bounded work after exact confirmation.
-- A separate approval, current authorization/status checks, and authoritative readback guard every source write.
-- Accessibility and screen capture permissions are separate. Capture is optional, user-selected, locally previewed, and separately approved for upload. No silent raw-video upload.
-- Local SQLite/FTS stores useful cited memory and deterministic records; Keychain stores credentials. No vector database or separate telemetry infrastructure.
+Verified [full hosted app run](https://github.com/i098/open-loops/actions/runs/40026691480) and [downloadable preview artifact](https://github.com/i098/open-loops/actions/runs/40026691480/artifacts/12533471126). Source hashes and local checks are in [verification](docs/verification/local-checks.md); the expanded native implementation plan remains a specification, not a hosted deployment or live integration.
 
-## Git initialization receipt
+Every PR and main push runs path detection and the stable **PR gate**. Relevant formatting, lint, browser/policy tests, and Sentrux must succeed; irrelevant jobs may skip. Changes to packaged inputs create a downloadable review artifact on PRs and a continuous-delivery artifact on main. Unrelated changes do not rebuild the preview.
 
-The target directory did not exist when inspected. Only `/Users/xiao/tmp/open-loops` was created and initialized. Neither `/Users/xiao/tmp` nor `.lavish` was initialized by this workstream.
+**Main is protected:** the exact `PR gate` context is required, branches must be up to date, administrators are included, and changes require a PR with zero human approvals. The policy was applied after a GET confirmed no existing protection and then verified by GET. No extra reviewer policy, auto-merge, or visibility change was introduced.
 
-Command executed:
+## Initialization receipt
+
+The target directory was absent when inspected. Only `/Users/xiao/tmp/open-loops` was created and initialized. Neither its crowded parent nor `.lavish` was initialized.
 
 ```sh
 mkdir /Users/xiao/tmp/open-loops && git -C /Users/xiao/tmp/open-loops init && git -C /Users/xiao/tmp/open-loops rev-parse --show-toplevel
 ```
 
-Exact command output:
+Exact output:
 
 ```text
 Initialized empty Git repository in /Users/xiao/tmp/open-loops/.git/
 /Users/xiao/tmp/open-loops
 ```
 
-The second line is the one-time exact-root verification. No staging or publication occurred during this initial documentation checkpoint. The user subsequently authorized commits, pushes, private GitHub publication, and path-aware CI/CD.
+The second line is the one-time exact-root verification. The original planning-only checkpoint did not stage or commit. The user subsequently authorized the private repository, commits/pushes, PR, and CI/CD. No destructive history changes were made.
 
-## Authorized publication and CI
+## Remaining live-integration prerequisites
 
-The private repository [i098/open-loops](https://github.com/i098/open-loops) has been created and configured as `origin`. Final verified sources are still pending; nothing has been pushed yet. Publication waits for the final snapshot and actual checks.
-
-Every pull request and main push will run path detection and the stable `PR gate`. Relevant formatting, linting, browser tests, and real Sentrux checks must pass; irrelevant checks may skip. Main builds a downloadable preview bundle as continuous delivery. No hosted deployment or native application build is implied. See [CI documentation](docs/CI.md) for the source-path matrix, provenance, and exact verification status.
-
-## Remaining facts, not assumptions
-
-Final evidence filenames, verified browser behavior, and final dashboard assets await `FINAL-READY`. Live Snowflake account/views/actor scope, the approved provider/model, authorized source connector, retention policy, and macOS signing identity/minimum OS remain integration prerequisites. The four-hour estimate is conditional, not a claim these prerequisites or integrations already exist.
+The planned core needs approved Snowflake OAuth/actor-scoped views and a dedicated Anthropic Messages API credential, exact accessible Claude model, and data/budget policy. Neither agent-host login nor a Claude Code/Codex subscription token substitutes for that API credential. Optional manual export needs no model key. Source writes, native sensing and signed distribution have their own authorization/retention/macOS prerequisites; missing inputs remain explicit stop gates.

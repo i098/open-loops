@@ -1,0 +1,5 @@
+# Strict first-party JavaScript check; no auto-created regression baseline.
+[constraints]
+max_cycles = 0
+max_cc = 25
+max_fn_lines = 100

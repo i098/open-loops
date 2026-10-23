@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+.sentrux/cache.bin
+.sentrux/baseline.json
+package-lock.json
+previews/quest-sprite.svg
