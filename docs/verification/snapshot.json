@@ -206,7 +206,7 @@
   "test_files": [
     {
       "path": "tests/ui.spec.mjs",
-      "sha256": "df93f6aa9695bf3a8cab5466a5eb7f6ed04f1cdd15353fb347c35d970e9e787b"
+      "sha256": "435f7bfbe34019d6f0ffe86933e338f7bec164e7ff8a4c0d49a5007c72db2549"
     }
   ]
 }

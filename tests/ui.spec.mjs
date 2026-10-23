@@ -536,59 +536,61 @@ test.describe('narrow touch surface', () => {
     );
     const box = await card(page).getByRole('heading').boundingBox();
     const client = await page.context().newCDPSession(page);
-    const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-    await client.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
-    for (const offset of [12, 35, 65, 110]) {
-      await client.send('Input.dispatchTouchEvent', {
-        type: 'touchMove',
-        touchPoints: [{ x: point.x - offset, y: point.y }],
-      });
-    }
-    await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-    await client.detach();
-    const detachedAt = Date.now();
-    await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
-    await expectXP(page, 0);
-    await close(page).tap();
     try {
-      await expect(dialog(page)).toBeHidden();
+      const point = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+      await client.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+      for (const offset of [12, 35, 65, 110]) {
+        await client.send('Input.dispatchTouchEvent', {
+          type: 'touchMove',
+          touchPoints: [{ x: point.x - offset, y: point.y }],
+        });
+      }
+      await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
+      await expectXP(page, 0);
+      await close(page).tap();
+      try {
+        await expect(dialog(page)).toBeHidden();
+      } finally {
+        await test.info().attach('touch-input-events.json', {
+          body: JSON.stringify(
+            { sessionAttached: true, events: await page.evaluate(() => globalThis.__touchLog) },
+            null,
+            2,
+          ),
+          contentType: 'application/json',
+        });
+      }
+      await page.getByRole('button', { name: /^Open Open Loops/ }).tap();
+      await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Unmute sounds' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      await page.setViewportSize({ width: 320, height: 740 });
+      await expect(back(page)).toBeVisible();
+      await expect(close(page)).toBeVisible();
+      expect(
+        await page.evaluate(() => globalThis.document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(320);
+      await back(page).tap();
+      const smallCard = await card(page).boundingBox();
+      expect(Math.abs(smallCard.height - (smallCard.width * 7) / 5)).toBeLessThanOrEqual(2);
+      expect(smallCard.width).toBeGreaterThanOrEqual(260);
+      await expectCardClearance(page);
+      await page.setViewportSize({ width: 320, height: 700 });
+      const shortCard = await card(page).boundingBox();
+      expect(Math.abs(shortCard.height - (shortCard.width * 7) / 5)).toBeLessThanOrEqual(2);
+      expect(shortCard.width).toBeGreaterThanOrEqual(260);
+      await expectCardClearance(page);
+      await page.getByRole('button', { name: /Next step/ }).tap();
+      await page.getByRole('button', { name: /Draft a question for Maya/ }).tap();
+      await accept(page).tap();
+      await expect(page.getByRole('heading', { name: 'Draft ready' })).toBeVisible();
+      await expectXP(page, 10);
     } finally {
-      await test.info().attach('touch-input-events.json', {
-        body: JSON.stringify(
-          { detachedAt, events: await page.evaluate(() => globalThis.__touchLog) },
-          null,
-          2,
-        ),
-        contentType: 'application/json',
-      });
+      await client.detach();
     }
-    await page.getByRole('button', { name: /^Open Open Loops/ }).tap();
-    await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Unmute sounds' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    await page.setViewportSize({ width: 320, height: 740 });
-    await expect(back(page)).toBeVisible();
-    await expect(close(page)).toBeVisible();
-    expect(
-      await page.evaluate(() => globalThis.document.documentElement.scrollWidth),
-    ).toBeLessThanOrEqual(320);
-    await back(page).tap();
-    const smallCard = await card(page).boundingBox();
-    expect(Math.abs(smallCard.height - (smallCard.width * 7) / 5)).toBeLessThanOrEqual(2);
-    expect(smallCard.width).toBeGreaterThanOrEqual(260);
-    await expectCardClearance(page);
-    await page.setViewportSize({ width: 320, height: 700 });
-    const shortCard = await card(page).boundingBox();
-    expect(Math.abs(shortCard.height - (shortCard.width * 7) / 5)).toBeLessThanOrEqual(2);
-    expect(shortCard.width).toBeGreaterThanOrEqual(260);
-    await expectCardClearance(page);
-    await page.getByRole('button', { name: /Next step/ }).tap();
-    await page.getByRole('button', { name: /Draft a question for Maya/ }).tap();
-    await accept(page).tap();
-    await expect(page.getByRole('heading', { name: 'Draft ready' })).toBeVisible();
-    await expectXP(page, 10);
   });
 });
 
