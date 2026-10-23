@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Browser prototypes and plans, not an implemented native Tauri application",
+  "description": "Open Loops: a desktop companion that turns stale work in Snowflake into cited Claude decision cards",
   "engines": {
     "node": ">=24"
   },
@@ -16,7 +16,9 @@
     "test": "node --test scripts/*.test.mjs",
     "test:ui": "playwright test",
     "check:sentrux": "node scripts/sentrux-check.mjs",
-    "bundle": "node scripts/bundle.mjs"
+    "bundle": "node scripts/bundle.mjs",
+    "live": "node server/server.mjs",
+    "demo:record": "node ~/.claude/skills/record-demo/bin/record.mjs demos/live-flow.mjs --out docs/media"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
@@ -27,5 +29,6 @@
     "prettier": "3.9.10",
     "stylelint": "17.16.0",
     "yaml": "2.9.1"
-  }
+  },
+  "license": "GPL-3.0-or-later"
 }

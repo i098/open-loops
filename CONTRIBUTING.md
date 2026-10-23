@@ -2,7 +2,7 @@
 
 Open Loops currently contains browser previews, tests and a native implementation plan. It does not contain a working Tauri application.
 
-Project and contribution licensing are **TBD**. Discuss substantial code contributions with the repository owner before submitting them. Do not choose a license, CLA or DCO policy on the owner's behalf. Track the remaining decisions in [OSS readiness](docs/OSS_READINESS.md).
+Open Loops is licensed under [GPL-3.0-or-later](LICENSE); contributions are accepted under the same terms (inbound = outbound). Discuss substantial code contributions with the repository owner before submitting them. Do not add a CLA or DCO policy on the owner's behalf. Track the remaining decisions in [OSS readiness](docs/OSS_READINESS.md).
 
 ## Start with a bounded change
 

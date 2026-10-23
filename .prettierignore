@@ -7,3 +7,4 @@ test-results/
 .sentrux/baseline.json
 package-lock.json
 previews/quest-sprite.svg
+demos/*.manifest.json

@@ -1,6 +1,6 @@
 # Credits and third-party terms
 
-Open Loops uses the projects listed below. Their licenses and terms remain separate from this repository's unresolved project license.
+Open Loops uses the projects listed below. Their licenses and terms remain separate from this repository's [GPL-3.0-or-later](LICENSE) license.
 
 ## Preview and tooling
 
@@ -20,4 +20,4 @@ Source and sprite hashes are recorded in [snapshot.json](docs/verification/snaps
 
 ## Planned native dependencies
 
-The [implementation contract](docs/implementation-plan.md) names Tauri, Rust, SQLite, Snowflake and Anthropic. This is a plan, not a claim those integrations are delivered. Review each dependency's license, service terms and credential/data requirements when implementing it.
+The live server (`server/`) calls the Snowflake SQL API and the Anthropic Messages API directly with Node's built-in `fetch`; their service terms apply to your account and data. The [implementation contract](docs/implementation-plan.md) also names Tauri, Rust and SQLite for the native build, which is still planned. Review each dependency's license, service terms and credential/data requirements when implementing it.
