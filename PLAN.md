@@ -16,7 +16,7 @@ Source hashes and transformations belong in [snapshot.json](docs/verification/sn
 
 ## 1. Product contract
 
-Turn a cited office loose end into a prepared prompt, one numbered decision, and an explicitly approved handoff. The prompt can be copied and opened in Claude, Codex, or another fixed supported tool. An API agent runner remains optional. Prepared or copied text never implies execution, a sent message, closed request, or granted external-tool permission.
+Turn cited Snowflake evidence into validated Anthropic Claude card packs and explicitly accepted read/draft jobs. The native implementation has one selected data/AI stack, not interchangeable providers. Manual Copy/Open to Claude or Codex is an optional export; copied text never implies execution, source changes, or external-tool permission.
 
 - **Companion:** an independent buddy, info card, and **5:7 poker-ratio** decision deck with meaningful backing edges, no heavy header, fake desktop, or shadows. The buddy keeps its stored resting anchor for the browser session. Root actions remain circular red-X/green-check controls; on child cards the green control becomes Back. No navigation bar, Back button, or reserved navigation space appears inside any card. Close stays in the info card. Preserve focus, draft, card, and running job.
 - **Left:** choose one of three snooze times. **Right:** choose one of two or three numbered read/draft actions, inspect the full brief, then explicitly accept. Swipes themselves grant no permission and no XP.
@@ -67,7 +67,7 @@ Keep essential text at least 16px; remove redundant minor subtexts rather than h
 
 Clipboard handoff needs no model API credentials. Copy writes exactly the reviewed prompt; a failed clipboard write must not claim success. Open launches only a fixed allowlisted Claude or Codex page and requires manual paste. Do not put the prompt into an invented URL scheme/query, autosubmit, or silently send it. Show copied/opened states, never ran/completed.
 
-The planned Tauri fast path may launch an installed Claude/Codex tool only through a supported, explicitly approved adapter with validated argument arrays—not arbitrary shell. External-tool permissions remain external: the Open Loops app sandbox does not control a pasted prompt or the destination tool. Neither copying nor opening guarantees a run or completion. A direct API runner is a separate optional integration with its own credential/data approval gates.
+An optional installed-tool export may use a supported explicitly approved adapter with validated argument arrays, never arbitrary shell. External tools retain their own permissions, and copying/opening proves no execution. This export is separate from the selected native Anthropic Messages API backend and never reuses agent-host subscription tokens as API credentials.
 
 ## 2. First run and recovery
 
@@ -79,7 +79,7 @@ Distinguish processing with zero cards, successful empty completion, partial fai
 
 ## 3. Architecture decisions
 
-**Tauri v2/macOS, not Electron.** Local HTML/CSS/JS runs in a system WebView. Rust owns state, async jobs, credentials access, network requests, command validation, approval enforcement, and SQLite. Declare custom-command permissions as well as per-window capabilities; never assume registering a command automatically restricts it. My day receives only read capabilities.
+**Tauri v2/macOS WKWebView, not Electron or a Chromium runtime.** Chromium is the browser-preview test engine only. The native provider choice is **Snowflake SQL API + Anthropic Claude Messages API**: Snowflake evidence feeds validated Claude card packs; explicit acceptance starts a bounded Claude read/draft job. Rust owns credentials, fixed queries, tools, approvals, and SQLite. Manual Claude/Codex export is optional. The [implementation contract](docs/implementation-plan.md) owns exact schemas, protocols, ordered build steps, and stop gates.
 
 Use three separate bounded windows: a tiny transparent **buddy window**, an **info window**, and a **deck window**. Rust owns the resting anchor, displayed buddy pose, and independent deck bounds; info follows below the displayed buddy. Optional My day uses a fourth, normal window. Give each window only its required capabilities. Avoid a common info/deck popover, fullscreen transparent click-blocking overlay, extra event bus, or per-window stores. The browser remains one DOM canvas and does not prove native focus, click-through, multi-display coordinates, or window positioning.
 
@@ -93,21 +93,21 @@ Rust persists state/checkpoint/event atomically before emitting sequenced Tauri 
 
 My day is a separate optional dashboard over the same local store, not a second approval path. Show timeline, agent jobs, accepted versus source-confirmed outcomes, memory evidence, and **observed / inferred / demo** provenance. No attention score or inferred productivity from app switches.
 
-Measure question submission to explicit confirmed decision. Count distinct source-verified stale closures in Monday–Sunday UTC reporting weeks only with matching authoritative readback; stale means **at least 30 days** under the agreed source-age definition. Exclude reopened records, demo records, proposals, XP, duplicate readbacks, and unknown outcomes from business proof. The exact authoritative source-age field and decision-time aggregation remain release prerequisites; the reporting week and reopened-record exclusion are settled.
+Measure question submission to explicit confirmed decision. Count distinct source-verified stale closures in Monday–Sunday UTC weeks only with matching authoritative readback; stale means **at least 30 days since source `CREATED_AT`** at closure, never since local discovery or last activity. Exclude reopened records, demo records, proposals, XP, duplicate readbacks and unknown outcomes. Missing authoritative creation mapping makes the age metric unavailable, not guessed. Decision-time aggregation remains a release prerequisite.
 
 ## 5. Four-hour development slice
 
-This is a conditional **240-minute prepare/approve/handoff vertical slice**, not a promise of production-native integrations in four hours.
+Use the ordered Snowflake + Anthropic native build contract in [the implementation reference](docs/implementation-plan.md#one-shot-execution-brief-and-stop-gates). The earlier 240-minute timebox is a checkpointing aid, not a guarantee that unknown account setup, native permissions, or live integrations finish in four hours.
 
-| Time        | Future work                                                                                                | Observable exit                                                                           |
-| ----------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| 0–30 min    | Reuse final renderer in minimal Tauri host; narrow command and capability policy                           | Allowed command succeeds; unknown command/window/payload rejected                         |
-| 30–85 min   | `store.rs` + `jobs.rs`: durable state, acceptance uniqueness, scan events/checkpoints                      | First card early; close/reopen/restart and retries preserve state without duplicate XP    |
-| 85–150 min  | Validated prompt review, exact clipboard copy, fixed tool-page handoff or supported installed-tool adapter | Reviewed prompt preserved; no unsupported prefill or execution claim                      |
-| 150–195 min | Complete companion lifecycle and same-store My day read surface                                            | External green Back/info Close, preserved draft/focus, truthful events/outcome provenance |
-| 195–240 min | Focused security/behavior tests and development package smoke                                              | Record actual toolchain, files, outcomes, and unresolved gates                            |
+| Time        | Future work                                                                           | Observable exit                                                                           |
+| ----------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 0–30 min    | Reuse final renderer in minimal Tauri host; narrow command and capability policy      | Allowed command succeeds; unknown command/window/payload rejected                         |
+| 30–85 min   | `store.rs` + `jobs.rs`: durable state, acceptance uniqueness, scan events/checkpoints | First card early; close/reopen/restart and retries preserve state without duplicate XP    |
+| 85–150 min  | Implement fixed Snowflake reads and bounded Anthropic card-pack/read-draft execution  | Validated cited packs, explicit acceptance, cancellation and quota tests pass             |
+| 150–195 min | Complete companion lifecycle and same-store My day read surface                       | External green Back/info Close, preserved draft/focus, truthful events/outcome provenance |
+| 195–240 min | Focused security/behavior tests and development package smoke                         | Record actual toolchain, files, outcomes, and unresolved gates                            |
 
-**Before the clock:** working macOS/Xcode/Rust/Tauri toolchain, verified browser source, clipboard access, and a chosen fixed tool page or supported installed tool. Live office evidence separately requires approved Snowflake access. An optional API runner separately requires provider credentials and a data policy. Clipboard handoff itself requires no API credentials. Missing prerequisites remain explicit blockers, not simulated live success.
+**Before live work:** working macOS/Xcode/Rust/Tauri toolchain, verified renderer, approved Snowflake account/OAuth/views/actor scope, and a dedicated Anthropic API credential plus exact model/data/budget policy. Missing inputs block live smoke, never justify simulated success. Optional manual export remains separate and needs no model API credential.
 
 **Later separately gated slices:** AX/helper/TCC, optional screenshot flow, authorized source connector, retention/delete/export policy, and signed/notarized distribution. Do not quietly include these in the estimate or fabricate their completion.
 

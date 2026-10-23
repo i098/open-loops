@@ -1,8 +1,8 @@
 # Open Loops — proposed Tauri execution architecture
 
-**Proposal only:** the HTML is a simulation; no native access, sync, database, model call, or source write is implemented.
+**Proposal only:** the HTML is a simulation; no native access, sync, database, model call, or source write is implemented. The selected native integration is **Snowflake SQL API + Anthropic Claude Messages API**, both called only by Rust. External Claude/Codex manual handoff remains an optional export.
 
-The proposed native app has separate bounded buddy, info, and deck windows plus an optional normal My day window. Rust owns one shared state and layout model. Info always follows below the displayed buddy; the deck has independent bounds and animation. Near the bottom edge, top-to-bottom order is deck including circular actions, buddy, info. Lift the buddy only enough to fit info; opening never overwrites its resting anchor, closing restores it, and an open buddy drag moves info but not deck. A browser single-DOM simulation does not prove native placement, focus, click-through, or multi-display behavior.
+On macOS, Tauri v2 renders in the system **WKWebView**, not Chromium. Chromium tests the browser preview only; native acceptance must run in the packaged Tauri app. Separate buddy, info, and deck windows share Rust-owned state, with optional normal My day. Deliberate drops replace the resting anchor; automatic boundary fitting does not; open drag moves info without moving the deck. No decorative buddy bounce. The [implementation contract](implementation-plan.md) owns exact command DTOs, SQLite transactions, connector protocols, stop gates, and the native build/smoke sequence.
 
 ## 1. Components and trust ownership
 
@@ -21,8 +21,8 @@ flowchart TB
   DB[("Same Rust-owned SQLite via store.rs<br/>Activity timestamps, observed/inferred provenance<br/>Memory refs, jobs, checkpoints, snoozes, acceptance XP<br/>Verified closure stored separately from XP")]
   RAM["Short-lived RAM<br/>Raw screenshot + working context<br/>Discard images after consented use"]
   KEY["macOS Keychain<br/>Narrow Rust/native credential API<br/>Does not encrypt SQLite"]
-  SF["Snowflake HTTP / read-only views<br/>Fixed parameterized queries<br/>Actor and row authorization"]
-  P["Optional ONE approved Claude OR GPT API<br/>Bounded read/draft tool loop<br/>Model has no direct write authority"]
+  SF["Snowflake SQL API / approved read-only views<br/>OAuth in Keychain; fixed bound queries<br/>Actor/row authorization; async poll/partition/cancel"]
+  P["Anthropic Claude Messages API<br/>Approved model + separate API key in Keychain<br/>Validated card packs and bounded read/draft jobs"]
   SRC["Optional authorized source API<br/>Existing connector only<br/>Fresh approval, write, authoritative readback"]
   TOOL["External Claude or Codex page<br/>Fixed allowlisted URL; user pastes manually<br/>Own permissions, outside app sandbox"]
   UI <-->|"invoke + sequenced events / snapshot"| CMD
@@ -60,7 +60,7 @@ sequenceDiagram
   participant DB as SQLite
   participant H as Swift helper
   participant SF as Snowflake views
-  participant P as One approved provider
+  participant P as Anthropic Claude Messages
   participant S as Source API
   participant T as External Claude or Codex
   UI->>R: Register event listener, then request status snapshot
@@ -76,9 +76,11 @@ sequenceDiagram
     loop Bounded batches
       R->>DB: Checkpoint analyzing_batch
       R-->>UI: analyzing_batch event
-      R->>R: Extract quest and precompute options, prompts, scopes, evidence
+      R->>P: Approved excerpts + card-pack tools, bounded budget
+      P-->>R: Complete card-pack submission with evidence IDs
+      R->>R: Validate options, citations and immutable read/draft scope
       R->>DB: Atomically persist validated complete card pack, checkpoint, event
-      R-->>UI: quest_ready event; own options ready before card is usable
+      R-->>UI: quest_ready event, own options ready before card is usable
     end
     alt Source failure after zero or some quests
       R->>DB: Persist failed status and retry checkpoint
@@ -107,7 +109,7 @@ sequenceDiagram
     UI->>R: Snooze quest until timestamp
     R->>DB: Persist snoozed_until, no model call or XP
   else Swipe right
-    UI-->>U: Stored task choices immediately; no navigation-time model call
+    UI-->>U: Stored task choices immediately, no navigation-time model call
     opt Explicit optional screenshot
       U->>R: Select allowed window, separate Screen Recording consent
       R->>H: Capture one ScreenCaptureKit still
@@ -118,17 +120,17 @@ sequenceDiagram
     UI-->>U: Exact brief, evidence, limits, destination
     opt Other
       UI-->>U: Prefilled prepared prompt in same card
-      U->>UI: Edit within hard limits, save, review; preserve parent history
+      U->>UI: Edit within hard limits, save, review, preserve parent history
     end
     alt Manual tool handoff
-      Note over U,DB: Copy/Open is explicit handoff; no acceptance XP or demo job required
+      Note over U,DB: Copy/Open is explicit handoff, no acceptance XP or demo job required
       U->>UI: Explicit Copy reviewed prompt
-      UI->>R: Copy exact text; report clipboard success or failure
+      UI->>R: Copy exact text, report clipboard success or failure
       U->>UI: Explicit Open fixed Claude or Codex page
       R->>T: Open allowlisted URL only, no prompt or autosubmit
-      U->>T: Manually paste; choose whether to run
-      Note over R,T: External permissions are not controlled by app sandbox; no run/completion guarantee
-    else Separately approved optional API job
+      U->>T: Manually paste, choose whether to run
+      Note over R,T: External permissions are not controlled by app sandbox, no run/completion guarantee
+    else Explicitly accepted Anthropic API job
       U->>UI: Accept quest
       UI->>R: Confirm stable quest ID and reviewed prompt revision
       R->>DB: Atomic unique acceptance + 10 XP once, not source closure
@@ -163,23 +165,23 @@ sequenceDiagram
 ```mermaid
 flowchart TD
   accTitle: Tauri vertical slices and test gates
-  G{"Handoff prerequisite gate<br/>macOS / Rust / Tauri toolchain<br/>Reviewed prompt + clipboard + fixed tool page"}
+  G{"Native prerequisite gate<br/>macOS / Rust / Tauri WKWebView<br/>Snowflake OAuth + views + actor scope<br/>Anthropic API credential + exact model"}
   F["Missing prerequisite<br/>Keep labeled fixtures / unavailable live operation<br/>No invented connection or sync result"]
   A["1. Host existing frontend in buddy/info/deck windows<br/>Optional normal My day window<br/>src-tauri/build.rs: AppManifest::commands<br/>capabilities/*.json per-window permissions<br/>Gate: deny unknown command/window/args"]
   B["2. Durable local state and bootstrap<br/>store.rs: rusqlite schema + FTS + checkpoints<br/>jobs.rs: async job + seq/event + snapshot/replay<br/>Gate: first card before complete; zero/empty/failure distinct<br/>Close/reopen and restart dedup; unique acceptance XP"]
-  C["3. Reviewed prompt handoff<br/>Exact Copy and fixed Claude/Codex Open<br/>Manual paste; no job merely for handoff<br/>Gate: no autosubmit or completion claim"]
-  API["Optional live evidence / API slice<br/>Approved Snowflake scope and ONE provider<br/>Bounded read/draft tools; credentials in Keychain<br/>Gate: actor scope, prompt injection, cancellation"]
+  C["3. Snowflake evidence + Anthropic core<br/>Validated complete packs before quest_ready<br/>Explicit acceptance starts bounded read/draft job<br/>Gate: actor scope, tool schema, quotas, cancellation"]
+  API["Optional manual export<br/>Exact Copy and fixed Claude/Codex Open<br/>No job or XP merely for export"]
   H["Optional native context slice<br/>native/ContextObserver.swift<br/>tauri.conf.json externalBin + target-suffixed binary<br/>Rust spawns packaged helper only<br/>Gate: signed app/helper TCC identity; AX denial/unknown content"]
   I["Optional screenshot slice<br/>ScreenCaptureKit in the same helper<br/>Separate permission + local preview/mask + send consent<br/>Gate: denial, discard, expiry; no continuous upload"]
   W["Optional source-write slice<br/>Rust-only authorized connector<br/>Gate: exact approval, permission/status recheck<br/>Timeout reconciliation and verified readback"]
-  T["One narrow prepare/approve/handoff workflow<br/>No new backend, queue service, WebSocket bus,<br/>vector DB, arbitrary shell or provider framework"]
+  T["Verified native read / accept / draft workflow<br/>No new backend, queue service, WebSocket bus,<br/>vector DB, arbitrary shell or provider framework"]
   G -->|"missing"| F
   G -->|"approved"| A
   A --> B --> C --> T
   B --> H --> I
-  C -->|"separate access and data approval"| API
-  I -->|"approved minimal context"| API
-  API -->|"existing connector authorized"| W
+  C --> API
+  I -->|"separately approved minimal context"| C
+  C -->|"existing source connector authorized"| W
   W --> T
   classDef gate fill:#f7efdf,stroke:#a58a56,color:#3c3220
   classDef slice fill:#edf1e9,stroke:#73836a,color:#253124
@@ -187,35 +189,44 @@ flowchart TD
   class A,B,C,API,H,I,W,T slice
 ```
 
-## 4. Onboarding UI tree — proposed screens, simulated choices
+## 4. Onboarding UI tree — native target, browser simulation
 
-Setup and prompt review use the same deck card; scan status stays in independent info. Source access comes first; AX permission, screen permission, image upload, acceptance, and source mutation are separate approvals. The tree's browser labels are simulated, while native transitions must be driven by real events.
+This diagram specifies the native target; the current browser's setup choices remain simulated. Source access, Anthropic credentials and evidence-transfer consent come before the first live scan. Optional Accessibility, screen capture and per-image upload are separate approvals. No credential value enters a WebView.
 
 ```mermaid
 flowchart TD
-  accTitle: Proposed onboarding UI tree — simulated, not native permissions
+  accTitle: Proposed native onboarding — no live access in this preview
   W["Welcome<br/>First-run companion"]
-  C["Connect work data<br/>Preview credentials / source selection"]
-  A{"Access check"}
-  V["Access verified<br/>Approved source scope"]
+  C["Connect Snowflake<br/>System-browser OAuth + approved views"]
+  A{"Verify actor, role and view contract"}
+  V["Source access verified<br/>Scoped read-only evidence"]
+  AI["Configure Anthropic<br/>Dedicated Keychain API credential + exact model"]
+  AM{"Verify model access"}
+  AF["Model access failed<br/>Repair credential or model permission"]
+  CONSENT{"Allow cited evidence to Anthropic?"}
+  MANUAL["Live analysis disabled<br/>Optional reviewed manual export only"]
   F["Connection failed<br/>Fix access or retry"]
   AX["Optional app context<br/>Accessibility permission screen"]
-  AXA["Allow selected app context<br/>Simulated choice only"]
-  AXS["Skip app context<br/>Manual / data-only operation"]
-  SS["Optional screenshot context<br/>Separate Screen Recording permission screen"]
+  AXA["Allow selected app context<br/>Native permission, separate from upload"]
+  AXS["Skip app context<br/>Data-only operation"]
+  SS["Optional screenshot context<br/>Separate Screen Recording permission"]
   SSA["Allow screenshots<br/>Still requires per-image preview / send consent"]
   SSS["Skip screenshots<br/>No capture"]
   START["Start first scan<br/>Explicit action; no XP"]
-  STREAM["Streaming activity<br/>Simulated events; no workspace connected"]
+  STREAM["Persisted scan activity<br/>Browser counterpart uses labeled fixtures"]
   WORK["Keep working<br/>Collapse companion; retain scan state"]
   REOPEN["Reopen companion<br/>Restore activity / current quest"]
   READY["First complete card pack ready<br/>Review now while scan continues"]
-  DECK["Same decision card<br/>Stored options / prompt editor / explicit handoff"]
+  DECK["Same decision card<br/>Stored options / prompt review / explicit API acceptance"]
   EMPTY["No quests found<br/>Only after successful scan completion"]
   PART["Some quests ready; scan incomplete<br/>Review available quests + retry failed source"]
   FAIL["Scan could not finish<br/>No quests ready; fix access / retry"]
   W --> C --> A
-  A -->|verified| V --> AX
+  A -->|verified| V --> AI --> AM
+  AM -->|verified| CONSENT
+  AM -->|failure| AF --> AI
+  CONSENT -->|yes| AX
+  CONSENT -->|no| MANUAL
   A -->|failure| F --> C
   AX --> AXA --> SS
   AX --> AXS --> SS
@@ -234,8 +245,8 @@ flowchart TD
   FAIL -->|retry| STREAM
   classDef screen fill:#fcfcf7,stroke:#73836a,color:#27332d
   classDef failure fill:#f7efdf,stroke:#a58a56,color:#503f22
-  class W,C,V,AX,AXA,AXS,SS,SSA,SSS,START,STREAM,WORK,REOPEN,READY,DECK,EMPTY screen
-  class F,PART,FAIL failure
+  class W,C,V,AI,CONSENT,MANUAL,AX,AXA,AXS,SS,SSA,SSS,START,STREAM,WORK,REOPEN,READY,DECK,EMPTY screen
+  class F,AF,PART,FAIL failure
 ```
 
 Sources: [Tauri architecture](https://v2.tauri.app/concept/architecture/), [command permissions and capabilities](https://v2.tauri.app/security/capabilities/), [packaged helper binaries](https://v2.tauri.app/develop/sidecar/), [AXObserver](https://developer.apple.com/documentation/applicationservices/axobserver), [ScreenCaptureKit](https://developer.apple.com/documentation/screencapturekit).

@@ -4,7 +4,7 @@ This report covers the transformed `previews/` files, not an earlier `.lavish` r
 
 ## Verified source identity
 
-- Companion: `d118f7839a65d1c170d972493a46b6c732009112055a3c86e4f1b2325459dbb5`.
+- Companion: `8355703b732dfbe9126e824283bd1ea9583247c641885b4ef4f26e8b9ef157d1` (inert native-plan text synchronized; application JS/CSS unchanged from `d118f783…`).
 - My day: `ed789a3d7d6eebe6a50758efd06beae2cc28b8f84aadabbb49ada8b284dac7ac`.
 - Shared sprite: `2d2bf1d2bf100c94591d61b19f60c592295890c7fce82339b8a5f768ad5f84db`, copied unchanged and excluded from formatting.
 
@@ -12,17 +12,17 @@ HTML imports extract executable JS/CSS, rebase relative CSS URLs, retain executi
 
 ## Executed final gates
 
-| Command                 | Actual result                                                                                          |
-| ----------------------- | ------------------------------------------------------------------------------------------------------ |
-| `npm run format`        | Completed using pinned Prettier; original source files untouched                                       |
-| `npm run format:check`  | Pass                                                                                                   |
-| `npm run lint`          | ESLint, HTML validation, Stylelint, Markdownlint pass                                                  |
-| `npm test`              | 13 policy/import tests pass; zero skipped                                                              |
-| `npm run test:ui`       | All 9 Chromium tests pass in 12.8 seconds; zero skipped/retried                                        |
-| `npm run check:sentrux` | Sentrux 0.5.7: all 3 strict rules pass; 3 application JS / 12 total first-party JS files; quality 6840 |
-| `npm run bundle`        | Created `dist/open-loops-preview.tar.gz` with per-file SHA-256 manifest                                |
+| Command                                  | Actual result                                                                                          |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `bun run format`                         | Completed using pinned Prettier; original source files untouched by formatting                         |
+| `bun run format:check`                   | Pass                                                                                                   |
+| `bun run lint:code`, `bun run lint:docs` | ESLint, HTML validation, Stylelint, Markdownlint pass                                                  |
+| `bun run test`                           | 13 policy/import tests pass; zero skipped                                                              |
+| `bun run test:ui`                        | All 9 Chromium tests pass in 12.7 seconds; zero skipped/retried                                        |
+| `bun run check:sentrux`                  | Sentrux 0.5.7: all 3 strict rules pass; 3 application JS / 12 total first-party JS files; quality 6840 |
+| `bun run bundle`                         | Created `dist/open-loops-preview.tar.gz` with per-file SHA-256 manifest                                |
 
-Local runtime: Node v26.12.1, npm 11.20.0. Hosted CI uses Node 24; local success is not a claim about hosted execution. Strict limits remain `max_cc=25`, `max_fn_lines=100`, `max_cycles=0`; no baseline, skipped tests, or continue-on-error was used.
+Final local commands used Bun 1.4.2 as the script runner with the already pinned dependencies; Node-based tools ran on Node v26.12.1. Hosted CI remains Node 24, unchanged. Strict limits remain `max_cc=25`, `max_fn_lines=100`, `max_cycles=0`; no baseline, skipped tests, or continue-on-error was used.
 
 ## Behavioral coverage
 
@@ -48,9 +48,15 @@ A separate delivery-owned browser inspected the final imported input-fix revisio
 
 Imported-copy screenshots: [desktop](../images/imported-desktop.png), [prompt](../images/imported-prompt.png), [320px card](../images/imported-mobile.png), [320px controls after scrolling](../images/imported-mobile-controls.png).
 
-Source-owner composition evidence: [desktop](../images/companion-desktop.png), [bottom](../images/companion-bottom.png), [options](../images/companion-options.png), [prompt](../images/companion-prompt.png), [mobile](../images/companion-mobile.png), [mobile controls](../images/companion-mobile-controls.png), [390px](../images/companion-mobile-390.png). Those images were captured on `374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f`, before behavior-only capture/navigation/placement fixes; the imported-copy evidence above covers the final hash. The [existing My day image](../images/personal-observability-desktop.png) is unchanged historical visual evidence, not a new final-hash capture.
+The widget screenshots above depict the `d118f783…` input-fix revision. The later plan-text synchronization leaves those runtime assets unchanged. Its [architecture screenshot](../images/imported-architecture.png) was captured from the final imported revision: all four Mermaid diagrams rendered as SVG and explicitly describe the proposed Snowflake/Anthropic/WKWebView design, not a live native integration.
+
+Source-owner composition evidence: [desktop](../images/companion-desktop.png), [bottom](../images/companion-bottom.png), [options](../images/companion-options.png), [prompt](../images/companion-prompt.png), [mobile](../images/companion-mobile.png), [mobile controls](../images/companion-mobile-controls.png), [390px](../images/companion-mobile-390.png). Those images were captured on `374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f`, before behavior-only capture/navigation/placement fixes; exact later capture revisions are recorded in the snapshot. The [existing My day image](../images/personal-observability-desktop.png) is unchanged historical visual evidence, not a new final-hash capture.
 
 Old small-card/inside-Back screenshots and earlier 61-check reports are superseded. No live Snowflake/model API, native permissions, real reminders, source writes, signing, or business outcome is claimed.
+
+## Native-plan example validation
+
+The proposed native DDL was extracted from the implementation plan and executed in an in-memory SQLite database. An ordinal-0 `steering` Other option, its prompt revision, and its acceptance inserted with valid foreign keys. Duplicate acceptance, a missing option FK, and a generated option mislabeled as steering were rejected. Three JSON examples and the one permission TOML example parsed successfully. These are documentation-contract checks only, not a Tauri build, WKWebView run, Snowflake connection, or Anthropic request.
 
 ## Cleanup and hosted status
 

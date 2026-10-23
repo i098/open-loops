@@ -16,7 +16,7 @@ A quiet macOS companion that turns office loose ends into numbered decisions and
 
 - **Companion:** a positionable buddy, an independent info card always below the displayed buddy, and a separately positioned 5:7 decision deck. Near the bottom edge, order is deck including circular actions, buddy, info; only the info card follows an open buddy drag. Includes progressive scripted first-scan activity, precomputed choices, a prefilled prompt editor, explicit handoff/approval, and Pip/Scout/Guide progression. Placement is browser-session state, not a native integration.
 - **My day:** separate example timeline, filters, agent outcomes, and memory provenance. Observed, inferred, and demo records are distinct.
-- **Target native product:** Tauri v2/macOS with separate buddy/info/deck windows and an optional normal My day window. Local HTML/CSS/JS WebViews have per-window capabilities; Rust owns state/jobs/commands, SQLite/FTS, and Keychain access. An optional signed Swift AX/ScreenCaptureKit helper handles approved local context. **Not Electron.** These integrations are planned, not implemented.
+- **Target native product:** Tauri v2/macOS system WKWebView, Rust-owned jobs/state, SQLite/FTS, and Keychain credentials. The selected live stack is **Snowflake SQL API + Anthropic Claude Messages API**, not a provider-choice framework. The [implementation contract](docs/implementation-plan.md) specifies protocols, schemas, transactions, command permissions, and ordered native acceptance gates. Optional Swift AX/ScreenCaptureKit context remains separately gated. These integrations are planned, not implemented; Chromium is only the browser-preview test engine.
 
 ## Plans and evidence
 
@@ -32,7 +32,7 @@ Source imports extract inline JS/CSS into `previews/assets/` for real analysis. 
 
 ## Development checks
 
-Use Node 24 or newer:
+These commands reproduce the verified Node 24 CI toolchain. Local preference is Bun (`bun run <script>`, `bunx <tool>`) with the already pinned dependencies; no CI/lockfile migration is implied.
 
 ```sh
 npm ci --ignore-scripts
@@ -51,7 +51,7 @@ The browser suite exercises rendered interactions, not source-text markers. Sent
 
 Repository: [i098/open-loops](https://github.com/i098/open-loops). [Draft PR #1](https://github.com/i098/open-loops/pull/1) publishes the verified previews and plans from `feat/verified-previews-ci`; it is not merged. The repository was created private, but a later API read returned `private: false`, `visibility: public`. That unexpected external change was reported and preserved; this workstream did not change visibility. No automatic merge or hosted deployment is authorized.
 
-Verified [full hosted run](https://github.com/i098/open-loops/actions/runs/40026326590) and [downloadable preview artifact](https://github.com/i098/open-loops/actions/runs/40026326590/artifacts/12533246114). Source hashes and current local checks are in [verification](docs/verification/local-checks.md); this is a browser preview, not a hosted deployment.
+Verified [full hosted app run](https://github.com/i098/open-loops/actions/runs/40026691480) and [downloadable preview artifact](https://github.com/i098/open-loops/actions/runs/40026691480/artifacts/12533471126). Source hashes and local checks are in [verification](docs/verification/local-checks.md); the expanded native implementation plan remains a specification, not a hosted deployment or live integration.
 
 Every PR and main push runs path detection and the stable **PR gate**. Relevant formatting, lint, browser/policy tests, and Sentrux must succeed; irrelevant jobs may skip. Changes to packaged inputs create a downloadable review artifact on PRs and a continuous-delivery artifact on main. Unrelated changes do not rebuild the preview.
 
@@ -76,4 +76,4 @@ The second line is the one-time exact-root verification. The original planning-o
 
 ## Remaining live-integration prerequisites
 
-Clipboard/manual-paste handoff needs no model API key. Live evidence needs approved Snowflake views and actor scope; an optional API runner separately needs one chosen provider/model and data policy. Real source writes need a separately authorized source API. Native context and release also need an app allowlist, retention policy, macOS targets, and signing credentials. Missing prerequisites remain explicit blockers, never simulated live success.
+The planned core needs approved Snowflake OAuth/actor-scoped views and a dedicated Anthropic Messages API credential, exact accessible Claude model, and data/budget policy. Neither agent-host login nor a Claude Code/Codex subscription token substitutes for that API credential. Optional manual export needs no model key. Source writes, native sensing and signed distribution have their own authorization/retention/macOS prerequisites; missing inputs remain explicit stop gates.

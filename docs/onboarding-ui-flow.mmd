@@ -1,29 +1,36 @@
 flowchart TD
-  accTitle: Proposed onboarding UI tree — simulated, not native permissions
-  %% Same decision deck hosts setup; independent info owns scan status below buddy.
-  %% Browser events/permissions are simulated; native transitions require real evidence.
+  accTitle: Proposed native onboarding — no live access in this preview
   W["Welcome<br/>First-run companion"]
-  C["Connect work data<br/>Preview credentials / source selection"]
-  A{"Access check"}
-  V["Access verified<br/>Approved source scope"]
+  C["Connect Snowflake<br/>System-browser OAuth + approved views"]
+  A{"Verify actor, role and view contract"}
+  V["Source access verified<br/>Scoped read-only evidence"]
+  AI["Configure Anthropic<br/>Dedicated Keychain API credential + exact model"]
+  AM{"Verify model access"}
+  AF["Model access failed<br/>Repair credential or model permission"]
+  CONSENT{"Allow cited evidence to Anthropic?"}
+  MANUAL["Live analysis disabled<br/>Optional reviewed manual export only"]
   F["Connection failed<br/>Fix access or retry"]
   AX["Optional app context<br/>Accessibility permission screen"]
-  AXA["Allow selected app context<br/>Simulated choice only"]
-  AXS["Skip app context<br/>Manual / data-only operation"]
-  SS["Optional screenshot context<br/>Separate Screen Recording permission screen"]
+  AXA["Allow selected app context<br/>Native permission, separate from upload"]
+  AXS["Skip app context<br/>Data-only operation"]
+  SS["Optional screenshot context<br/>Separate Screen Recording permission"]
   SSA["Allow screenshots<br/>Still requires per-image preview / send consent"]
   SSS["Skip screenshots<br/>No capture"]
   START["Start first scan<br/>Explicit action; no XP"]
-  STREAM["Streaming activity<br/>Simulated events; no workspace connected"]
+  STREAM["Persisted scan activity<br/>Browser counterpart uses labeled fixtures"]
   WORK["Keep working<br/>Collapse companion; retain scan state"]
   REOPEN["Reopen companion<br/>Restore activity / current quest"]
   READY["First complete card pack ready<br/>Review now while scan continues"]
-  DECK["Same decision card<br/>Stored options / prompt editor / explicit handoff"]
+  DECK["Same decision card<br/>Stored options / prompt review / explicit API acceptance"]
   EMPTY["No quests found<br/>Only after successful scan completion"]
   PART["Some quests ready; scan incomplete<br/>Review available quests + retry failed source"]
   FAIL["Scan could not finish<br/>No quests ready; fix access / retry"]
   W --> C --> A
-  A -->|verified| V --> AX
+  A -->|verified| V --> AI --> AM
+  AM -->|verified| CONSENT
+  AM -->|failure| AF --> AI
+  CONSENT -->|yes| AX
+  CONSENT -->|no| MANUAL
   A -->|failure| F --> C
   AX --> AXA --> SS
   AX --> AXS --> SS
@@ -42,5 +49,5 @@ flowchart TD
   FAIL -->|retry| STREAM
   classDef screen fill:#fcfcf7,stroke:#73836a,color:#27332d
   classDef failure fill:#f7efdf,stroke:#a58a56,color:#503f22
-  class W,C,V,AX,AXA,AXS,SS,SSA,SSS,START,STREAM,WORK,REOPEN,READY,DECK,EMPTY screen
-  class F,PART,FAIL failure
+  class W,C,V,AI,CONSENT,MANUAL,AX,AXA,AXS,SS,SSA,SSS,START,STREAM,WORK,REOPEN,READY,DECK,EMPTY screen
+  class F,AF,PART,FAIL failure

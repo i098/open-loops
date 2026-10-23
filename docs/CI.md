@@ -117,7 +117,7 @@ npm install --ignore-scripts
 
 Observed: user `i098`; initial repository 404; created repository confirmed private; Sentrux 0.5.7; 249 npm packages installed. No credentials were written to repository docs. Initial npm engine warning reflected Node26 versus the first proposed strict Node24 range; package support now allows Node24 and newer while CI remains on Node24.
 
-Final companion source is `d118f7839a65d1c170d972493a46b6c732009112055a3c86e4f1b2325459dbb5`; dashboard source is `ed789a3d7d6eebe6a50758efd06beae2cc28b8f84aadabbb49ada8b284dac7ac`. All 9 local browser paths include real touch and motion-enabled placement/click checks; 13 policy/import tests, formatter/lint, strict Sentrux, and bundling also pass. Exact counts, scanner score, and hashes are recorded in [local checks](verification/local-checks.md) and [snapshot](verification/snapshot.json). Hosted results below were observed separately.
+Final companion source is `8355703b732dfbe9126e824283bd1ea9583247c641885b4ef4f26e8b9ef157d1`; dashboard source is `ed789a3d7d6eebe6a50758efd06beae2cc28b8f84aadabbb49ada8b284dac7ac`. The final change synchronizes inert native-plan text and diagrams; extracted application JS/CSS remain unchanged from the proven input fix. All 9 local browser paths, 13 policy/import tests, formatter/lint, strict Sentrux and bundling pass. Exact local results/hashes are in [local checks](verification/local-checks.md) and [snapshot](verification/snapshot.json); hosted results below were observed separately.
 
 ## Hosted execution receipts
 
@@ -127,8 +127,8 @@ The initial hidden-dialog wait exposed missing native click delivery rather than
 
 ### Successful full run and artifact
 
-[Run 40026326590](https://github.com/i098/open-loops/actions/runs/40026326590) completed successfully for PR head `45e06fec2866d98f87411a2b58e1951aa4e32cb3`: Detect, Format, Lint, Browser and CI behavior (9 browser paths and 13 policy/import tests), Sentrux, `PR gate`, and Downloadable preview bundle all succeeded.
+[Run 40026691480](https://github.com/i098/open-loops/actions/runs/40026691480) completed successfully for diagnostic-free PR head `5dbfefd60d5730fa71c64d83b781be9f6800b47c`: Detect, Format, Lint, Browser and CI behavior (9 browser paths and 13 policy/import tests), Sentrux, `PR gate`, and Downloadable preview bundle all succeeded.
 
-[Artifact 12533246114](https://github.com/i098/open-loops/actions/runs/40026326590/artifacts/12533246114), `open-loops-preview-4082d5667fc850d7b53f60f66fb00d5d5f8a1f00`, was uploaded only after the gate. It is 814410 bytes and expires 2026-11-22. GitHub's artifact ZIP digest is `sha256:ded4774595d46e19d6f51759a423205ca4856c51024af150af3f30666b6047a4`.
+[Artifact 12533471126](https://github.com/i098/open-loops/actions/runs/40026691480/artifacts/12533471126), `open-loops-preview-092fac65d364947f69f7d2d5be0de52a958d4725`, was uploaded only after the gate. It is 832042 bytes and expires 2026-11-22. GitHub's artifact ZIP digest is `sha256:fb8747fe80a45c4bb2165929620f16864d857f4d9e07c09c53912f431b8c4a82`.
 
-The downloaded archive was opened and all 31 manifest file hashes matched. Its manifest commit is the PR merge-ref commit `4082d5667fc850d7b53f60f66fb00d5d5f8a1f00`, not the branch-head SHA. The final receipt/diagnostic-cleanup head is verified separately through the [current PR checks](https://github.com/i098/open-loops/pull/1/checks), without recursively committing each new run ID.
+The downloaded archive was opened and all 31 manifest file hashes matched. Its manifest commit is the PR merge-ref commit `092fac65d364947f69f7d2d5be0de52a958d4725`, not the branch-head SHA. The subsequent native-plan expansion changes documentation and inert in-preview plan text only; current-head checks remain visible on the [PR](https://github.com/i098/open-loops/pull/1/checks). No native implementation or live API request is inferred from this preview proof.
