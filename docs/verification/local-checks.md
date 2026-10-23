@@ -4,7 +4,7 @@ This report covers the transformed `previews/` files, not an earlier `.lavish` r
 
 ## Verified source identity
 
-- Companion: `82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31`.
+- Companion: `d118f7839a65d1c170d972493a46b6c732009112055a3c86e4f1b2325459dbb5`.
 - My day: `ed789a3d7d6eebe6a50758efd06beae2cc28b8f84aadabbb49ada8b284dac7ac`.
 - Shared sprite: `2d2bf1d2bf100c94591d61b19f60c592295890c7fce82339b8a5f768ad5f84db`, copied unchanged and excluded from formatting.
 
@@ -18,7 +18,7 @@ HTML imports extract executable JS/CSS, rebase relative CSS URLs, retain executi
 | `npm run format:check`  | Pass                                                                                                   |
 | `npm run lint`          | ESLint, HTML validation, Stylelint, Markdownlint pass                                                  |
 | `npm test`              | 13 policy/import tests pass; zero skipped                                                              |
-| `npm run test:ui`       | All 9 Chromium tests pass in 12.5 seconds; zero skipped/retried                                        |
+| `npm run test:ui`       | All 9 Chromium tests pass in 12.8 seconds; zero skipped/retried                                        |
 | `npm run check:sentrux` | Sentrux 0.5.7: all 3 strict rules pass; 3 application JS / 12 total first-party JS files; quality 6840 |
 | `npm run bundle`        | Created `dist/open-loops-preview.tar.gz` with per-file SHA-256 manifest                                |
 
@@ -34,7 +34,7 @@ Local runtime: Node v26.12.1, npm 11.20.0. Hosted CI uses Node 24; local success
 
 ## Findings resolved
 
-The first hosted Linux run found a test event-completion race: after a real Close tap returned, the next buddy tap resolved while the dialog was still open. The test now waits for the observable hidden dialog before reopening, without changing input type or adding sleeps, forced clicks, retries, or skips. That fix changed only test synchronization, not the product source.
+Hosted Linux exposed a missing native click after fast swipes. The hidden-dialog wait, retained CDP session, and deferred DOM replacement did not resolve it. Bounded telemetry showed normal pointer/touch delivery but no synthesized Close click, matching [Chromium's phantom-fling defect](https://issues.chromium.org/issues/407890253). A scoped non-passive `touchmove` listener cancels defaults only after horizontal lock with one touch and a cancelable event. The same real swipe/Close/reopen test then passed on hosted Chromium. No synthetic event, arbitrary sleep, force-click, retry, or weakened assertion was added. Temporary telemetry is removed.
 
 Earlier full runs exposed a fast buddy-drag capture bug and missing Back while a source receipt was pending. The canonical owner acquired pointer capture on pointerdown, retained the 8px threshold and up/cancel release, and made parent return independent of action-busy guards. History-aware return also covers activity. Async identity guards remain intact.
 
@@ -44,7 +44,7 @@ The test suite was updated for the user's superseding contract: large cards, no 
 
 ## Independent browser evidence
 
-After the final import and gates, a separate delivery-owned browser tab loaded the transformed preview with motion enabled. A deliberate open drop at `(698.5,112)` stayed at exactly those coordinates after close and reopen; the art had zero animations. It measured a 320×448 desktop front face and 260×364 at 320×700. The prefilled prompt and external controls remained usable. Earlier independent inspection also covered the unchanged My day synthetic timeline and source provenance.
+A separate delivery-owned browser inspected the final imported input-fix revision with motion enabled and recaptured the desktop, prefilled prompt, and 320×700 views; the narrow face measured 260×364 and external controls remained reachable. The earlier independent motion inspection measured a 320×448 desktop face and an open drop at `(698.5,112)` unchanged across close/reopen with zero art animations. Current automated regressions separately verify that retained behavior. My day's unchanged synthetic timeline and provenance were also inspected independently.
 
 Imported-copy screenshots: [desktop](../images/imported-desktop.png), [prompt](../images/imported-prompt.png), [320px card](../images/imported-mobile.png), [320px controls after scrolling](../images/imported-mobile-controls.png).
 

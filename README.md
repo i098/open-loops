@@ -51,6 +51,8 @@ The browser suite exercises rendered interactions, not source-text markers. Sent
 
 Repository: [i098/open-loops](https://github.com/i098/open-loops). [Draft PR #1](https://github.com/i098/open-loops/pull/1) publishes the verified previews and plans from `feat/verified-previews-ci`; it is not merged. The repository was created private, but a later API read returned `private: false`, `visibility: public`. That unexpected external change was reported and preserved; this workstream did not change visibility. No automatic merge or hosted deployment is authorized.
 
+Verified [full hosted run](https://github.com/i098/open-loops/actions/runs/40026326590) and [downloadable preview artifact](https://github.com/i098/open-loops/actions/runs/40026326590/artifacts/12533246114). Source hashes and current local checks are in [verification](docs/verification/local-checks.md); this is a browser preview, not a hosted deployment.
+
 Every PR and main push runs path detection and the stable **PR gate**. Relevant formatting, lint, browser/policy tests, and Sentrux must succeed; irrelevant jobs may skip. Changes to packaged inputs create a downloadable review artifact on PRs and a continuous-delivery artifact on main. Unrelated changes do not rebuild the preview.
 
 **Main is protected:** the exact `PR gate` context is required, branches must be up to date, administrators are included, and changes require a PR with zero human approvals. The policy was applied after a GET confirmed no existing protection and then verified by GET. No extra reviewer policy, auto-merge, or visibility change was introduced.

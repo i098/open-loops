@@ -24,7 +24,7 @@
       "passed": 9,
       "skipped": 0,
       "retries": 0,
-      "seconds": 12.5
+      "seconds": 12.8
     },
     "sentrux": {
       "version": "0.5.7",
@@ -145,27 +145,27 @@
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
+      "capture_source_sha256": "d118f7839a65d1c170d972493a46b6c732009112055a3c86e4f1b2325459dbb5",
       "path": "docs/images/imported-desktop.png",
       "sha256": "76fc4742617c4de9e85cdaaacf8c1b68d5a90dcf0d1b87d21871be97920ca301"
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
+      "capture_source_sha256": "d118f7839a65d1c170d972493a46b6c732009112055a3c86e4f1b2325459dbb5",
       "path": "docs/images/imported-prompt.png",
-      "sha256": "97647bbb7cef846b9379aa1d544ef04f2b93625f3cec8f3713ec33454cca894e"
+      "sha256": "b7d667a66f53e3445742b6e73f308b22738a82225ddb71d811a65a2934fcf158"
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
+      "capture_source_sha256": "d118f7839a65d1c170d972493a46b6c732009112055a3c86e4f1b2325459dbb5",
       "path": "docs/images/imported-mobile.png",
-      "sha256": "67a4a163fdab70f9d772388be05bc90e3587c0e4e54bd50cf46e163e88e1c920"
+      "sha256": "9720571f4889ba0378621057ddc35e298df604f9e8962b78401f6f2d6ca76037"
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
+      "capture_source_sha256": "d118f7839a65d1c170d972493a46b6c732009112055a3c86e4f1b2325459dbb5",
       "path": "docs/images/imported-mobile-controls.png",
-      "sha256": "67d7c5ead8086468106856568db4554945175c352b16e4c2076b57fe00b0a68f"
+      "sha256": "65d6d5df86ac0c8c40bf22c8108940b6ab866650f8649503162e0a0bb5700bfb"
     },
     {
       "kind": "unchanged historical dashboard image",
@@ -176,7 +176,7 @@
   "documents": [
     {
       "path": "README.md",
-      "sha256": "cdc1ca007896d86a7c584dd7cf24efa332b09934fe147d037bb7aeeae8b216a5"
+      "sha256": "2d5fad1250ac06356a1dff872d64e8371e43f08bead69cae443c5541ed94164f"
     },
     {
       "path": "PLAN.md",
@@ -206,7 +206,7 @@
   "test_files": [
     {
       "path": "tests/ui.spec.mjs",
-      "sha256": "126226e6b96db32fca121dd436ac8cacb9d2fe0e0def791343b0eed9b73d301b"
+      "sha256": "c03a41306e9fcb99f3b254edb297fd9d48175ebed3eadd7f4bc212c2c5c5d139"
     }
   ]
 }

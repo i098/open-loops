@@ -474,50 +474,6 @@ test('background task and source receipts cannot replace another quest draft', a
   }
 });
 
-async function captureTouchEvents(page) {
-  await page.evaluate(() => {
-    const events = (globalThis.__touchLog = []);
-    for (const type of [
-      'pointerdown',
-      'pointerup',
-      'pointercancel',
-      'touchstart',
-      'touchmove',
-      'touchend',
-      'click',
-      'gotpointercapture',
-      'lostpointercapture',
-    ]) {
-      globalThis.document.addEventListener(
-        type,
-        (event) => {
-          const point = event.changedTouches?.[0] ?? event;
-          const hit = globalThis.document.elementFromPoint(point.clientX ?? 0, point.clientY ?? 0);
-          const state = () => ({
-            type,
-            time: Date.now(),
-            target: event.target.id || event.target.tagName,
-            hit: hit?.id || hit?.tagName,
-            defaultPrevented: event.defaultPrevented,
-            pointerId: event.pointerId,
-            pointerType: event.pointerType,
-            capture:
-              event.pointerId !== undefined && event.target.hasPointerCapture?.(event.pointerId),
-            x: point.clientX,
-            y: point.clientY,
-            open: globalThis.document.querySelector('#buddy-toggle').getAttribute('aria-expanded'),
-          });
-          if (events.length < 160) events.push({ phase: 'capture', ...state() });
-          globalThis.queueMicrotask(() => {
-            if (events.length < 160) events.push({ phase: 'after', ...state() });
-          });
-        },
-        true,
-      );
-    }
-  });
-}
-
 test.describe('narrow touch surface', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
 
@@ -525,7 +481,6 @@ test.describe('narrow touch surface', () => {
     page,
   }) => {
     await openReady(page);
-    await captureTouchEvents(page);
     const narrowCard = await card(page).boundingBox();
     expect(Math.abs(narrowCard.height - (narrowCard.width * 7) / 5)).toBeLessThanOrEqual(2);
     expect(narrowCard.width).toBeGreaterThanOrEqual(260);
@@ -550,18 +505,7 @@ test.describe('narrow touch surface', () => {
       await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
       await expectXP(page, 0);
       await close(page).tap();
-      try {
-        await expect(dialog(page)).toBeHidden();
-      } finally {
-        await test.info().attach('touch-input-events.json', {
-          body: JSON.stringify(
-            { sessionAttached: true, events: await page.evaluate(() => globalThis.__touchLog) },
-            null,
-            2,
-          ),
-          contentType: 'application/json',
-        });
-      }
+      await expect(dialog(page)).toBeHidden();
       await page.getByRole('button', { name: /^Open Open Loops/ }).tap();
       await expect(page.getByRole('heading', { name: 'When should this return?' })).toBeVisible();
       await expect(page.getByRole('button', { name: 'Unmute sounds' })).toHaveAttribute(
