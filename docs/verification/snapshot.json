@@ -40,7 +40,7 @@
   "sources": [
     {
       "source": ".lavish/open-loops.html",
-      "source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
+      "source_sha256": "edd48c0f03d6fa41e8cd0e1972e0c534c5ec8a1e46a08683e30e77e53900d65a",
       "outputs": [
         {
           "path": "previews/open-loops.html",
@@ -48,7 +48,7 @@
         },
         {
           "path": "previews/assets/open-loops.js",
-          "sha256": "7d524888c26cc358905f2331142f0de95980c8f4f2e326c42d276f11bab1763b"
+          "sha256": "72078e812e538791f98ab4896ba2871866333cc58be66aa1947e8efb2983025b"
         },
         {
           "path": "previews/assets/open-loops-2.mjs",

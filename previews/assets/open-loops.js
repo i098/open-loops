@@ -1382,12 +1382,33 @@
             Math.sign(velocity) === Math.sign(d.dx)));
     d.card.classList.remove('dragging');
     if (d.card.hasPointerCapture(e.pointerId)) d.card.releasePointerCapture(e.pointerId);
-    if (committed) {
-      chooseSide(d.dx < 0 ? 'snooze' : 'act', e, true);
-    } else {
+    if (!committed) {
       d.card.style.transform = '';
       delete d.card.dataset.direction;
+      return;
     }
+    const side = d.dx < 0 ? 'snooze' : 'act';
+    if (e.pointerType !== 'touch') {
+      chooseSide(side, e, true);
+      return;
+    }
+    const quest = current,
+      from = view;
+    // Keep the touched node connected through native touchend dispatch.
+    requestAnimationFrame(() => {
+      if (
+        !open ||
+        current !== quest ||
+        view !== from ||
+        !d.card.isConnected ||
+        body.querySelector('#swipe-card') !== d.card
+      ) {
+        d.card.style.transform = '';
+        delete d.card.dataset.direction;
+        return;
+      }
+      chooseSide(side, e, true);
+    });
   }
   body.addEventListener('pointerup', (e) => endDrag(e));
   body.addEventListener('pointercancel', (e) => endDrag(e, true));
