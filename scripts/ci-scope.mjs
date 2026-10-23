@@ -16,7 +16,7 @@ export function selectChecks(paths) {
     lint: codeLint || docsLint,
     code_lint: codeLint,
     docs_lint: docsLint,
-    test: all || paths.some((path) => /^(?:previews\/|tests\/)/.test(path)),
+    test: all || paths.some((path) => /^(?:previews\/|tests\/|server\/|data\/)/.test(path)),
     sentrux:
       all || paths.some((path) => /^(?:previews\/|tests\/).+\.(?:html|css|js|mjs|cjs)$/.test(path)),
     bundle:

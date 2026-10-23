@@ -190,14 +190,19 @@
     { id: 'week', label: 'Next week', help: 'In seven days at 09:00 UTC' },
   ]);
   const cardPacks = new Map();
+  // Live mode: server/server.mjs injects OPEN_LOOPS_LIVE and streams Claude card packs.
+  const LIVE = window.OPEN_LOOPS_LIVE || null;
+  const actionIds = new Set();
   function prepareCardPacks() {
-    const ids = new Set();
-    for (const item of items) {
+    for (const item of items) preparePack(item);
+  }
+  function preparePack(item) {
+    {
       item.tasks.forEach((entry, index) => {
         entry.actionId = `${item.record}:action:${index + 1}`;
-        if (ids.has(entry.actionId) || !entry.brief.trim())
+        if (actionIds.has(entry.actionId) || !entry.brief.trim())
           throw Error('Invalid fixture action pack');
-        ids.add(entry.actionId);
+        actionIds.add(entry.actionId);
         entry.allowedScopes = Object.freeze(['fixture:read', 'draft:prepare']);
         entry.childCard = Object.freeze({
           title: copy[item.id].labels[index],
@@ -232,6 +237,11 @@
         }),
       );
     }
+  }
+  if (LIVE) {
+    items.length = 0;
+    const tag = document.querySelector('.platform-preview');
+    if (tag) tag.textContent = 'Live';
   }
   prepareCardPacks();
   function resolveSnooze(index) {
@@ -289,6 +299,8 @@
   const readyIds = new Set(),
     scanEvents = [],
     scanTimers = [];
+  let liveSource = null;
+  const sample = (text) => (LIVE ? text.replace(/\b[Ss]ample /g, '') : text);
   const handled = new Set(),
     accepted = new Set();
   const navigation = [],
@@ -498,7 +510,9 @@
           ? `${items.indexOf(current) + 1} of ${readyIds.size}`
           : scanStatus === 'failed'
             ? `${readyIds.size} ready`
-            : 'Setup preview';
+            : LIVE
+              ? 'Ready to scan'
+              : 'Setup preview';
     age.textContent = current
       ? copy[current.id].age
       : scanStatus === 'running'
@@ -507,7 +521,11 @@
           ? 'Incomplete'
           : scanStatus === 'complete'
             ? 'Scan complete'
-            : 'Not connected';
+            : LIVE
+              ? LIVE.evidence.startsWith('Snowflake')
+                ? 'Snowflake'
+                : 'Demo data'
+              : 'Not connected';
   }
   const button = (label, command, primary = false) =>
     `<button class="button ${primary ? 'primary' : ''}" data-do="${command}">${label}</button>`;
@@ -520,6 +538,7 @@
     return `<ul class="activity-list">${events.map((e) => `<li><time>+${e.seconds}s</time><span>${e.text}</span></li>`).join('')}</ul>`;
   }
   function publishScan(text, id = null, terminal = null) {
+    text = sample(text);
     if (id && !cardPacks.has(id)) throw Error('Quest must have a complete prepared card pack');
     const previous = readyIds.size;
     if (id) readyIds.add(id);
@@ -540,18 +559,49 @@
         meta.textContent =
           scanStatus === 'running'
             ? `${readyIds.size} ready · Scan running`
-            : 'Sample scan complete';
+            : sample('Sample scan complete');
     }
     if (previous === 0 && readyIds.size === 1)
-      status.textContent =
-        'Your first sample quest is ready. More sample sources are still being checked.';
+      status.textContent = sample(
+        'Your first sample quest is ready. More sample sources are still being checked.',
+      );
     if (terminal)
-      status.textContent =
+      status.textContent = sample(
         terminal === 'complete'
           ? 'Sample scan complete.'
-          : `${readyIds.size} quests ready. Sample scan incomplete.`;
+          : `${readyIds.size} quests ready. Sample scan incomplete.`,
+      );
+  }
+  function startLiveScan() {
+    liveSource?.close();
+    scanStatus = 'running';
+    scanStarted = performance.now();
+    render('activity');
+    publishScan(`Live scan started · ${LIVE.evidence}`);
+    const es = new EventSource('/api/scan');
+    liveSource = es;
+    es.addEventListener('status', (e) => publishScan(JSON.parse(e.data).text));
+    es.addEventListener('quest', (e) => {
+      const d = JSON.parse(e.data);
+      if (cardPacks.has(d.quest.id)) return;
+      items.push(d.quest);
+      copy[d.quest.id] = d.copy;
+      preparePack(d.quest);
+      publishScan(d.text, d.quest.id);
+    });
+    es.addEventListener('done', (e) => {
+      const d = JSON.parse(e.data);
+      es.close();
+      publishScan(d.text, null, d.status === 'complete' ? 'complete' : 'failed');
+    });
+    es.onerror = () => {
+      if (es.readyState === EventSource.CLOSED || scanStatus !== 'running') return;
+      es.close();
+      publishScan('Lost connection to the Open Loops server', null, 'failed');
+    };
   }
   function startScan() {
+    if (LIVE) return startLiveScan();
     scanTimers.splice(0).forEach(clearTimeout);
     scanStatus = 'running';
     scanStarted = performance.now();
@@ -604,8 +654,8 @@
   }
   function renderScanContent(next) {
     if (next === 'setup') {
-      body.innerHTML = `<div class="face">${title('Finding your first quests')}<p class="body-copy">The first scan isn’t instant. Cards appear as they’re found. You can keep working while I scan.</p><p class="fine-print">This is a simulated scan. No workspace is connected.</p></div>`;
-      footer.innerHTML = `${button('Start setup preview', 'start-setup', true)}<button class="text-button setup-skip" data-do="skip-setup">Skip to ready preview</button>`;
+      body.innerHTML = `<div class="face">${title('Finding your first quests')}<p class="body-copy">The first scan isn’t instant. Cards appear as they’re found. You can keep working while I scan.</p><p class="fine-print">${LIVE ? `Reads ${esc(LIVE.evidence)}. Claude (${esc(LIVE.model)}) writes each card.` : 'This is a simulated scan. No workspace is connected.'}</p></div>`;
+      footer.innerHTML = `${button(LIVE ? 'Start live scan' : 'Start setup preview', 'start-setup', true)}<button class="text-button setup-skip" data-do="skip-setup">Skip to ready preview</button>`;
       footer.hidden = false;
     }
     if (next === 'activity') {
@@ -635,7 +685,7 @@
             (n
               ? 'Your sample quests are ready.'
               : 'Nothing needs your attention in the sources checked.');
-      body.innerHTML = `<div class="face">${title(heading)}<p class="body-copy">${message}</p><p class="activity-label">Simulated activity · no workspace connected</p>${activityRows(scanEvents.slice(-3))}${scanEvents.length > 3 ? `<details class="activity-history"><summary>Activity</summary>${activityRows(scanEvents)}</details>` : ''}</div>`;
+      body.innerHTML = `<div class="face">${title(sample(heading))}<p class="body-copy">${sample(message)}</p><p class="activity-label">${LIVE ? 'Live activity · server events' : 'Simulated activity · no workspace connected'}</p>${activityRows(scanEvents.slice(-3))}${scanEvents.length > 3 ? `<details class="activity-history"><summary>Activity</summary>${activityRows(scanEvents)}</details>` : ''}</div>`;
       footer.innerHTML = n
         ? `<div class="action-pair">${button('Keep working', 'close')}${button(running ? 'Review first quest' : `Review ${n} quests`, 'review-ready', true)}</div>${failed ? '<button class="text-button setup-skip" data-do="start-setup">Retry sample source</button>' : ''}`
         : failed
@@ -675,7 +725,7 @@
       body.innerHTML = `<div class="face">${title('When should this return?')}<p class="face-context">${current.record} · ${copy[current.id].short}</p><div class="choice-list">${snoozes.map((s, n) => choice(n + 1, s.label, s.help, `data-snooze="${n}" data-action-id="${current.record}:snooze:${s.id}"`)).join('')}</div></div>`;
     }
     if (next === 'snoozed') {
-      body.innerHTML = `<div class="face">${title('Snoozed in this preview')}<p class="date-value">Returns: <time datetime="${lastSnooze.dueAt}">${lastSnooze.time}</time></p><p class="body-copy">No real reminder was scheduled.</p></div>`;
+      body.innerHTML = `<div class="face">${title(LIVE ? 'Snoozed' : 'Snoozed in this preview')}<p class="date-value">Returns: <time datetime="${lastSnooze.dueAt}">${lastSnooze.time}</time></p><p class="body-copy">${LIVE ? (LIVE.evidence.startsWith('Snowflake') ? 'Logged to LOOP_JOURNAL in Snowflake. No XP.' : 'Kept for this session. No XP.') : 'No real reminder was scheduled.'}</p></div>`;
       footer.innerHTML = `<div class="action-pair">${button('Undo', 'undo')}${button('Next quest', 'next', true)}</div>`;
       footer.hidden = false;
     }
@@ -695,12 +745,12 @@
         )}</div><button class="evidence-link" data-do="evidence">View evidence</button></div>`;
     }
     if (next === 'evidence') {
-      body.innerHTML = `<div class="face"><blockquote class="quote" id="panel-title" tabindex="-1">${current.quote}</blockquote><p class="source-meta">${current.cite}<br>${current.evidence}</p><p class="source-meta">${current.source}</p><p class="fine-print">Fixture records. Snapshot only; check the current source before acting.</p></div>`;
+      body.innerHTML = `<div class="face"><blockquote class="quote" id="panel-title" tabindex="-1">${current.quote}</blockquote><p class="source-meta">${current.cite}<br>${current.evidence}</p><p class="source-meta">${current.source}</p><p class="fine-print">${LIVE ? `${esc(LIVE.evidence)}. Snapshot only; check the current source before acting.` : 'Fixture records. Snapshot only; check the current source before acting.'}</p></div>`;
     }
   }
   function renderTaskContent(next) {
     if (next === 'brief' || next === 'edit') {
-      body.innerHTML = `<div class="face">${title(taskLabel())}<p class="face-context">Demo agent · ${current.record}</p><dl class="scope-list"><div><dt>Read</dt><dd>${task.childCard.read}</dd></div><div><dt>Return</dt><dd>${task.childCard.output}</dd></div><div><dt>Limits</dt><dd>No messages, record changes, approvals or screen access.</dd></div></dl><p class="brief-label">Exact outgoing brief</p>${next === 'edit' ? `<label class="sr-only" for="action-note">Task brief</label><textarea class="note-field" id="action-note" maxlength="900">${esc(note)}</textarea>` : `<div class="exact-brief" id="payload-note" data-selectable>${esc(note)}</div><button class="evidence-link" data-do="edit">Edit brief</button>`}<p class="fine-print">Preview only. No model request leaves this browser.</p><p class="form-error" id="form-error" role="status"></p></div>`;
+      body.innerHTML = `<div class="face">${title(taskLabel())}<p class="face-context">${LIVE ? 'Claude' : 'Demo agent'} · ${current.record}</p><dl class="scope-list"><div><dt>Read</dt><dd>${task.childCard.read}</dd></div><div><dt>Return</dt><dd>${task.childCard.output}</dd></div><div><dt>Limits</dt><dd>No messages, record changes, approvals or screen access.</dd></div></dl><p class="brief-label">Exact outgoing brief</p>${next === 'edit' ? `<label class="sr-only" for="action-note">Task brief</label><textarea class="note-field" id="action-note" maxlength="900">${esc(note)}</textarea>` : `<div class="exact-brief" id="payload-note" data-selectable>${esc(note)}</div><button class="evidence-link" data-do="edit">Edit brief</button>`}<p class="fine-print">${LIVE ? `Accept sends this brief and the cited records to ${esc(LIVE.model)}.` : 'Preview only. No model request leaves this browser.'}</p><p class="form-error" id="form-error" role="status"></p></div>`;
       const existingJob = jobs.get(current.id),
         acceptLabel =
           existingJob && existingJob.status !== 'canceled'
@@ -716,8 +766,8 @@
       footer.hidden = false;
     }
     if (next === 'dispatched' || next === 'running') {
-      body.innerHTML = `<div class="face"><p class="state-label">Preview job · ${next === 'dispatched' ? 'accepted' : 'preparing'}</p>${title('Preparing preview result')}<p class="body-copy">Demo agent · ${taskLabel()}</p><p class="fine-print">No live agent is running.</p></div>`;
-      footer.innerHTML = button('Cancel preview job', 'cancel-job');
+      body.innerHTML = `<div class="face"><p class="state-label">${LIVE ? 'Claude job' : 'Preview job'} · ${next === 'dispatched' ? 'accepted' : 'preparing'}</p>${title(LIVE ? 'Claude is drafting' : 'Preparing preview result')}<p class="body-copy">${LIVE ? 'Claude' : 'Demo agent'} · ${taskLabel()}</p><p class="fine-print">${LIVE ? 'Read/draft only. Nothing is sent or changed.' : 'No live agent is running.'}</p></div>`;
+      footer.innerHTML = button(LIVE ? 'Cancel job' : 'Cancel preview job', 'cancel-job');
       footer.hidden = false;
     }
     if (next === 'canceled') {
@@ -727,7 +777,7 @@
     }
     if (next === 'result') {
       const resultTitle = taskLabel().startsWith('Draft') ? 'Draft ready' : 'Summary ready';
-      body.innerHTML = `<div class="face">${title(resultTitle)}<div class="result-copy" data-selectable>${task.result}</div><p class="fine-print">Prepared in this preview. Nothing was sent.</p><button class="evidence-link" data-do="evidence">View evidence</button></div>`;
+      body.innerHTML = `<div class="face">${title(resultTitle)}<div class="result-copy" data-selectable>${task.result}</div><p class="fine-print">${LIVE ? 'Drafted by Claude. Nothing was sent or changed.' : 'Prepared in this preview. Nothing was sent.'}</p><button class="evidence-link" data-do="evidence">View evidence</button></div>`;
       footer.innerHTML = `<div class="action-pair">${task.write ? button(task.write.operation.startsWith('Close') ? 'Review closing' : 'Review sending', 'review-write') : ''}${button('Next quest', 'next', true)}</div>`;
       footer.hidden = false;
     }
@@ -918,14 +968,37 @@
       job.status = 'running';
       if (current === job.quest && view === 'dispatched') render('running');
     }, 450);
-    job.finishTimer = setTimeout(() => {
+    if (LIVE) {
+      fetch('/api/run', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ record: job.quest.record, brief: job.note }),
+      })
+        .then((r) => r.json())
+        .catch((err) => ({ error: err.message }))
+        .then((d) => {
+          if (job.status === 'canceled') return;
+          job.task.result = esc(d.text || `Claude couldn’t finish: ${d.error}`).replace(
+            /\n/g,
+            '<br>',
+          );
+          finishJob(job);
+        });
+      return;
+    }
+    job.finishTimer = setTimeout(() => finishJob(job), 1300);
+  }
+  function finishJob(job) {
+    {
       if (job.status === 'canceled') return;
       job.status = 'ready';
       handled.add(job.quest.id);
       updateCount();
       if (current === job.quest && ['running', 'dispatched'].includes(view)) showJob(job);
-      status.textContent = 'Preview result ready. Nothing was sent.';
-    }, 1300);
+      status.textContent = LIVE
+        ? 'Claude result ready. Nothing was sent.'
+        : 'Preview result ready. Nothing was sent.';
+    }
   }
   function sourceKey(quest, chosenTask) {
     return `${quest.id}:${quest.tasks.indexOf(chosenTask)}`;
@@ -1408,6 +1481,12 @@
     const snooze = e.target.closest('[data-snooze]');
     if (snooze && view === 'snooze') {
       lastSnooze = resolveSnooze(Number(snooze.dataset.snooze));
+      if (LIVE)
+        fetch('/api/snooze', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ record: current.record, dueAt: lastSnooze.dueAt }),
+        }).catch(() => {});
       engaged = true;
       handled.add(current.id);
       sound('drop', e);

@@ -58,3 +58,6 @@ node_modules/
 
 # Deliberately do not ignore HTML, Markdown, Mermaid, SVG, screenshots,
 # source-plan snapshots, or the application dependency lockfiles.
+
+# record-demo run manifests (local paths)
+demos/*.manifest.json

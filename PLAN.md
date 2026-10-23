@@ -1,6 +1,6 @@
 # Open Loops — delivery plan
 
-**Current boundary:** browser prototypes and documented plans. The native Tauri application, Snowflake/model connections, SQLite/Keychain integration, native sensing, and source writes are not implemented. The previews and CI are published in [draft PR #1](https://github.com/i098/open-loops/pull/1), not merged. Repository visibility now reads public after an unexpected external change; this workstream preserved it.
+**Current boundary:** the browser companion runs live against Snowflake (SQL API v2, read plus `LOOP_JOURNAL` memory) and Claude (Messages API) through `server/server.mjs`. The native Tauri application, SQLite/Keychain integration, Snowflake OAuth, native sensing, and source writes are not implemented. The previews and CI are published in [draft PR #1](https://github.com/i098/open-loops/pull/1), not merged. Repository visibility now reads public after an unexpected external change; this workstream preserved it.
 
 ## Read the plan
 

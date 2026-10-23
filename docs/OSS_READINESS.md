@@ -1,6 +1,6 @@
 # OSS publication readiness
 
-This repository is public. Public access does not establish an open-source license. The items below separate available contributor documentation from decisions the owner still needs to make.
+This repository is public and licensed under [GPL-3.0-or-later](../LICENSE). The items below separate available contributor documentation from decisions the owner still needs to make.
 
 ## Available
 
@@ -18,17 +18,17 @@ The CI workflow, browser tests and bundle are implemented. Tauri, native sensing
 
 ## Owner decisions still required
 
-| Decision                                                      | Status and consequence                                                                                                                                      |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Project license and contribution terms                        | **TBD.** Do not label the project MIT, Apache, FSL or OSI open source until the owner selects and publishes terms. No placeholder LICENSE file is provided. |
-| Imported artwork/source reuse rights                          | **TBD.** Review the [recorded provenance](verification/snapshot.json) and third-party terms before relicensing or redistribution.                           |
-| Private vulnerability-reporting channel and security owner    | **TBD.** Follow [SECURITY](../SECURITY.md); do not send sensitive reports to a public issue.                                                                |
-| Named maintainers and conduct-reporting contact               | **TBD.** Do not infer a support team or private contact from the repository owner account.                                                                  |
-| Supported versions, release process and response expectations | **TBD.** Current guidance applies to the preview on main; no release support window or SLA is promised.                                                     |
+| Decision                                                      | Status and consequence                                                                                                            |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Project license and contribution terms                        | **Decided:** [GPL-3.0-or-later](../LICENSE), contributions inbound = outbound.                                                    |
+| Imported artwork/source reuse rights                          | **TBD.** Review the [recorded provenance](verification/snapshot.json) and third-party terms before relicensing or redistribution. |
+| Private vulnerability-reporting channel and security owner    | **TBD.** Follow [SECURITY](../SECURITY.md); do not send sensitive reports to a public issue.                                      |
+| Named maintainers and conduct-reporting contact               | **TBD.** Do not infer a support team or private contact from the repository owner account.                                        |
+| Supported versions, release process and response expectations | **TBD.** Current guidance applies to the preview on main; no release support window or SLA is promised.                           |
 
 ## Before describing this as a licensed open-source release
 
-1. Choose the license and contribution terms; publish the real license text and confirm imported-material rights.
+1. ~~Choose the license~~ (GPL-3.0-or-later, done). Confirm imported-material rights.
 2. Configure a private security-reporting route and publish its verified instructions.
 3. Confirm maintainers, conduct escalation and version-support policy.
 4. Run the applicable gates, check the downloaded bundle's manifest, and review the public docs for private data.
