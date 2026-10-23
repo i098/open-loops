@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        margin: 0;
+        width: 1440px;
+        height: 860px;
+        background: #1e2a24;
+        color: #f3f5ef;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 110px;
+        box-sizing: border-box;
+      }
+      h2 {
+        font-size: 52px;
+        margin: 0 0 44px;
+      }
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        font-size: 24px;
+      }
+      .b {
+        background: #2b3b33;
+        border: 1px solid #3d5247;
+        border-radius: 18px;
+        padding: 22px 26px;
+        line-height: 1.35;
+      }
+      .b b {
+        display: block;
+        color: #8fc4a8;
+        font-size: 17px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .a {
+        color: #8fc4a8;
+        font-size: 34px;
+      }
+      ul {
+        margin: 48px 0 0;
+        padding: 0;
+        list-style: none;
+        font-size: 26px;
+        color: #c9d3cc;
+        line-height: 1.7;
+      }
+      .u {
+        margin-top: 40px;
+        font-size: 22px;
+        color: #8fc4a8;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Stop only where a person should choose.</h2>
+    <div class="flow">
+      <div class="b"><b>Snowflake</b>LOOP_EVIDENCE<br />bound SQL API read</div>
+      <div class="a">→</div>
+      <div class="b"><b>Cortex AI_COMPLETE</b>Claude writes 2-3<br />cited trajectories</div>
+      <div class="a">→</div>
+      <div class="b"><b>Person</b>picks one,<br />or snoozes</div>
+      <div class="a">→</div>
+      <div class="b"><b>Snowflake</b>LOOP_JOURNAL memory<br />steers the next scan</div>
+    </div>
+    <ul>
+      <li>Every quote is checked verbatim against the cited row. Uncited cards are dropped.</li>
+      <li>Nothing is sent, approved or closed without a second explicit approval.</li>
+    </ul>
+    <div class="u">github.com/i098/open-loops · GPL-3.0</div>
+  </body>
+</html>
