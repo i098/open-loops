@@ -29,11 +29,31 @@ test('workflow and toolchain changes select every applicable check', () => {
 });
 
 test('docs and unrelated binary changes do not run application tests or Sentrux', () => {
-  assert.deepEqual(selectChecks(['PLAN.md']), {
+  for (const path of [
+    'PLAN.md',
+    'CONTRIBUTING.md',
+    'SECURITY.md',
+    'SUPPORT.md',
+    'CODE_OF_CONDUCT.md',
+    'CHANGELOG.md',
+    'CREDITS.md',
+    '.github/PULL_REQUEST_TEMPLATE.md',
+  ]) {
+    assert.deepEqual(selectChecks([path]), {
+      format: true,
+      lint: true,
+      code_lint: false,
+      docs_lint: true,
+      test: false,
+      sentrux: false,
+      bundle: true,
+    });
+  }
+  assert.deepEqual(selectChecks(['.github/ISSUE_TEMPLATE/bug_report.yml']), {
     format: true,
-    lint: true,
+    lint: false,
     code_lint: false,
-    docs_lint: true,
+    docs_lint: false,
     test: false,
     sentrux: false,
     bundle: true,
@@ -63,7 +83,7 @@ test('application JavaScript selects code checks but not unrelated Markdown lint
 });
 
 test('unpackaged Markdown changes skip browser work and artifact rebuild', () => {
-  const selection = selectChecks(['CONTRIBUTING.md']);
+  const selection = selectChecks(['notes/research.md']);
   assert.equal(selection.format, true);
   assert.equal(selection.docs_lint, true);
   assert.equal(selection.test, false);

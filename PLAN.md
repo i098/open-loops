@@ -123,7 +123,7 @@ Real Sentrux 0.5.7 uses pinned binary/grammar hashes, telemetry opt-out, strict 
 
 A successful main push creates an actual downloadable preview archive with a SHA-256 manifest. A successful PR may produce a review artifact when packaged inputs change. Neither means hosted deployment or native release. The exact path matrix, Action pins, commands, results, and GitHub run/artifact links belong in [CI.md](docs/CI.md).
 
-**Main protection is enforced:** verified GET reports required `PR gate`, strict up-to-date checks, administrator enforcement, and PRs with zero human approvals. The earlier private-repository HTTP 403 is historical. No extra reviewer policy, visibility mutation, or auto-merge was introduced.
+**Hackathon merge policy:** ordinary merges require `PR gate` and zero human approvals. The up-to-date requirement and administrator enforcement are off, so the owner can bypass protection. Force pushes and deletion remain disabled in the rule. No auto-merge or visibility change was introduced.
 
 ## 7. Final handoff gates
 

@@ -468,15 +468,50 @@ The live native slice requires approved Snowflake account/views, actor/row scope
 
 For native context or distribution, also require an allowed target app, test consent for TCC prompts, a stable bundle ID, appropriate signing identities/entitlements, and selected architectures/minimum OS. Screenshot capture additionally needs its separate permission and confirmed ScreenCaptureKit API availability. Missing prerequisites become visible blocked gates, never fake live success.
 
+### Selected scaffold: Better-T Stack
+
+Use **Better-T Stack 3.48.0**, Bun, React/Vite, TanStack Router and its official Tauri addon. Select no JavaScript backend, auth service, API framework, database or ORM; Rust still owns Snowflake, Anthropic, SQLite and Keychain. This combination passed the CLI's dry-run compatibility check. Generation, installation and native builds have not run.
+
+The proposed generated workspace is `desktop/`. All `src-tauri/...` shorthand in this plan is relative to `desktop/apps/web/`; its repository path is `desktop/apps/web/src-tauri/...`. The verified preflight command runs from an isolated staging directory, not this repository root:
+
+```sh
+bunx create-better-t-stack@3.48.0 open-loops-bts-preflight \
+  --frontend tanstack-router \
+  --backend none \
+  --runtime none \
+  --database none \
+  --orm none \
+  --api none \
+  --auth none \
+  --payments none \
+  --db-setup none \
+  --addons tauri \
+  --examples none \
+  --web-deploy none \
+  --server-deploy none \
+  --package-manager bun \
+  --no-install \
+  --no-git \
+  --open none \
+  --directory-conflict error \
+  --disable-analytics \
+  --no-render-title \
+  --dry-run --verbose
+```
+
+Only after generation is authorized, remove the dry-run flags, inspect the output, and move the complete workspace into `desktop/` without a nested Git repository or caches. Do not add `--yes`, force the CLI through `bunx --bun`, or overwrite this repository. `--no-install` still allows the Tauri addon to execute `@tauri-apps/cli@latest init`; the BTS version pin is **not** a complete dependency lock. Record the resolved Tauri version and commit `bun.lock`/`Cargo.lock` after the approved install/build.
+
+Expected frontend entry points are `desktop/apps/web/src/main.tsx` and `src/routes/`; native files are under `desktop/apps/web/src-tauri/`. Port the approved UI behavior into those React views rather than replacing it with starter screens. Keep the existing preview and root lockfile intact. The generated `apps/web` package provides `desktop:dev` and `desktop:build`; no extra workspace runner is needed. Sources: [official options](https://www.better-t-stack.dev/docs/cli/options), [Tauri compatibility](https://www.better-t-stack.dev/docs/cli/compatibility#tauri-desktop-apps), and [pinned addon implementation](https://github.com/AmanVarshney01/create-better-t-stack/blob/77d306e1209fb3a4d34082ddb950fafdeb93ba44/apps/cli/src/helpers/addons/tauri-setup.ts).
+
 ### Proposed file/module sequence
 
-| Order                              | Future files                                                                                                                                                     | Responsibility / dependency                                                                                                                                                                                  |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1. Host and boundary               | Final local HTML/JS/CSS; `src-tauri/Cargo.toml`, `tauri.conf.json`, `build.rs`, per-window `capabilities/*.json`, `src/main.rs`, `src/lib.rs`, `src/commands.rs` | Reuse UI in separate buddy/info/deck windows and optional normal My day; custom-command permissions, least-privilege capabilities, origin/argument validation, CSP, local assets. No new frontend framework. |
-| 2. State and bootstrap             | `src-tauri/src/store.rs`, `jobs.rs`; renderer bridge at existing state owner                                                                                     | SQLite schema/FTS, unique acceptance, event journal/checkpoints, snapshot/replay, async startup/retry/cancel, card append without focus/draft reset.                                                         |
-| 3. Snowflake + Anthropic execution | `src-tauri/src/snowflake.rs`, `anthropic.rs`, `jobs.rs`, `commands.rs`; separate `handoff.rs`                                                                    | Fixed bound Snowflake reads, validated Claude card-pack/read-draft loop, consent, budgets, cancellation, and truthful results. Manual handoff remains independent.                                           |
-| 4. Optional authorized extensions  | `src-tauri/src/context.rs`, `native/ContextObserver.swift`; later `src-tauri/src/source_actions.rs`                                                              | Normalize AX/native messages; separately gated still capture. Implement source connector only with actual authorization and authoritative readback.                                                          |
-| 5. History, checks, packaging      | Existing My day HTML + narrow bridge; focused Rust checks and browser workflow check; Tauri bundling configuration                                               | Same-store read model, metrics/provenance, recovery checks, bundle helper/resources, sign/notarize and validate installed app behavior.                                                                      |
+| Order                              | Future files                                                                                                                                                | Responsibility / dependency                                                                                                                                        |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1. Host and boundary               | Generated React/Vite entry points, `src-tauri/{Cargo.toml,tauri.conf.json,build.rs}`, `src-tauri/src/{main.rs,lib.rs,commands.rs}`, per-window capabilities | Port the approved UI into separate buddy/info/deck windows and optional My day; preserve behavior and enforce narrow commands.                                     |
+| 2. State and bootstrap             | `src-tauri/src/store.rs`, `jobs.rs`; renderer bridge at existing state owner                                                                                | SQLite schema/FTS, unique acceptance, event journal/checkpoints, snapshot/replay, async startup/retry/cancel, card append without focus/draft reset.               |
+| 3. Snowflake + Anthropic execution | `src-tauri/src/snowflake.rs`, `anthropic.rs`, `jobs.rs`, `commands.rs`; separate `handoff.rs`                                                               | Fixed bound Snowflake reads, validated Claude card-pack/read-draft loop, consent, budgets, cancellation, and truthful results. Manual handoff remains independent. |
+| 4. Optional authorized extensions  | `src-tauri/src/context.rs`, `native/ContextObserver.swift`; later `src-tauri/src/source_actions.rs`                                                         | Normalize AX/native messages; separately gated still capture. Implement source connector only with actual authorization and authoritative readback.                |
+| 5. History, checks, packaging      | Existing My day HTML + narrow bridge; focused Rust checks and browser workflow check; Tauri bundling configuration                                          | Same-store read model, metrics/provenance, recovery checks, bundle helper/resources, sign/notarize and validate installed app behavior.                            |
 
 These are planning names. No empty module, mock connector, TODO implementation, or generated scaffold is delivered in this documentation task. Follow actual final source organization rather than splitting one HTML into speculative modules merely to match this table.
 
@@ -500,28 +535,29 @@ Settings onboarding shows configured account/model, disclosure of exactly what s
 
 Provision the Anthropic API key through macOS Keychain Access's secure password-entry UI or another explicitly approved native credential channel, never a WebView field, command-line argument, repository file, or agent-host login cache. `test_connections` is an explicit action: probe Snowflake identity/role and column contracts, check the approved Claude model and a bounded test request, then report actual results. Missing access leaves live controls disabled with a specific reason while local fixtures remain visibly separate.
 
-| Order                        | Files to implement once                                                                                                                                                                                    | Exit gate                                                                                                                                    |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1. Native shell and IPC      | `src-tauri/{Cargo.toml,build.rs,tauri.conf.json}`, `src-tauri/src/{main.rs,lib.rs,commands.rs}`, `src-tauri/permissions/*.toml`, four `src-tauri/capabilities/*.json`, `previews/assets/native-bridge.mjs` | Existing card UI runs in WKWebView; unknown command/window/payload denied; renderer has no direct HTTP or secrets                            |
-| 2. State and replay          | `src-tauri/src/store.rs`, `src-tauri/src/jobs.rs`; migration above; one cancellation token per Rust job                                                                                                    | SQLite rollback/restart/replay and duplicate acceptance tests pass; first complete card arrives before full scan ends                        |
-| 3. Credentials and Snowflake | `src-tauri/src/credentials.rs`, `src-tauri/src/snowflake.rs`, settings/connection view in the existing deck                                                                                                | Verified actor/role/view schema; bound-query, 202/poll/partition/cancel/401/403/429 tests; no raw model SQL                                  |
-| 4. Claude execution          | `src-tauri/src/anthropic.rs`; reuse `jobs.rs`/DTO validation; optional export in `src-tauri/src/handoff.rs`                                                                                                | Complete validated packs, explicit acceptance, tool-result matching, budgets, cancellation and stale-callback tests; no live source mutation |
-| 5. Native acceptance/package | read-only My day bridge; native integration tests and Tauri bundle config                                                                                                                                  | Real authorized Snowflake → Claude card → accept → cited draft smoke, then installed WKWebView/permission checks; no fixture counted as live |
+| Order                        | Files to implement once                                                                                                                                   | Exit gate                                                                                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Native shell and IPC      | `src-tauri/{Cargo.toml,build.rs,tauri.conf.json}`, `src-tauri/src/{main.rs,lib.rs,commands.rs}`, permissions/capabilities, web `src/lib/native-bridge.ts` | Approved card UI runs in WKWebView; unknown command/window/payload denied; renderer has no direct HTTP or secrets                            |
+| 2. State and replay          | `src-tauri/src/store.rs`, `src-tauri/src/jobs.rs`; migration above; one cancellation token per Rust job                                                   | SQLite rollback/restart/replay and duplicate acceptance tests pass; first complete card arrives before full scan ends                        |
+| 3. Credentials and Snowflake | `src-tauri/src/credentials.rs`, `src-tauri/src/snowflake.rs`, settings/connection view in the existing deck                                               | Verified actor/role/view schema; bound-query, 202/poll/partition/cancel/401/403/429 tests; no raw model SQL                                  |
+| 4. Claude execution          | `src-tauri/src/anthropic.rs`; reuse `jobs.rs`/DTO validation; optional export in `src-tauri/src/handoff.rs`                                               | Complete validated packs, explicit acceptance, tool-result matching, budgets, cancellation and stale-callback tests; no live source mutation |
+| 5. Native acceptance/package | read-only My day bridge; native integration tests and Tauri bundle config                                                                                 | Real authorized Snowflake → Claude card → accept → cited draft smoke, then installed WKWebView/permission checks; no fixture counted as live |
 
-The native bridge maps existing renderer actions to the exact IPC contract; native domain state comes from snapshots/events, not a competing fixture store. Keep browser fixture mode explicitly separate. A future `scripts/build-native.mjs` stages the approved renderer into `dist/native`, substitutes reviewed local vendor assets for CDN references, and adds the native bridge; `tauri.conf.json` points `frontendDist` there. Do not maintain a hand-edited duplicate UI. Native runtime has no remote script/style loading; all network authority remains in Rust.
+The web package's `src/lib/native-bridge.ts` maps React actions to the exact IPC contract. Native domain state comes from snapshots/events, not a competing fixture store. Keep the browser prototype separate and retain the approved UI behavior when porting it. Use Vite's generated `dist/` and the Tauri addon's `frontendDist: "../dist"` relation; bundle reviewed local assets instead of CDN scripts. All network authority remains in Rust.
 
 Use Tauri v2, Serde, `rusqlite` with bundled SQLite, `reqwest` with TLS, UUIDs, Tauri's async runtime/Tokio primitives, and one Keychain adapter. Pin compatible versions and commit `Cargo.lock` when the native project is actually created; do not create empty native modules now. No separate server, queue service, vector database, agent framework, or multi-provider router is required. Bundle the current CSS/JS/sprite locally and remove runtime CDN dependencies from the native renderer.
 
-Bun is the selected local frontend/package runner; the planned package pins `@tauri-apps/cli` v2 and uses `bun run build:native` / `bunx tauri`. Rust still builds with Cargo. This preference does not silently migrate the already-verified Node 24 preview CI or its lockfile.
+Bun is the local frontend/package runner; the generated web package exposes the Tauri desktop scripts. Rust still builds with Cargo. The existing root Node 24 preview CI/lockfile remain unchanged; add native workspace checks only with the future implementation.
 
 **Native acceptance commands**, after the real project exists:
 
 ```sh
+cd desktop/apps/web
 cargo fmt --manifest-path src-tauri/Cargo.toml --check
 cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 cargo test --manifest-path src-tauri/Cargo.toml
-bunx tauri dev
-bunx tauri build
+bun run desktop:dev
+bun run desktop:build
 ```
 
 Keep existing browser gates as additional regression coverage. Extend path-aware CI to native sources only when those files exist; a browser Chromium pass is never a WKWebView or Rust build pass.
@@ -586,7 +622,7 @@ GitHub publication and preview delivery are authorized; repository visibility an
 
 ## 11. Skills and preserved guidance
 
-Installed current user-level skills from Crewship are `app-dashboard` and `code-clarity` under `/Users/xiao/.agents/skills/`, with existing Claude links. The existing different `process-safety` skill was preserved, not overwritten. The source report records pinned commit `9897a9c845f7a7cdb3ab2dbb685ec647aa8c10d6`, 18 file-integrity matches, and the adapter warning `PromptScript does not support global skill installation`; that warning is not a claim the verified user-level copies failed.
+The design guidance uses `app-dashboard` for legible, bounded interfaces and `code-clarity` for ownership and derived state. These are implementation references, not runtime dependencies or permission grants.
 
 Apply app-dashboard/shared-basics for legible choices, one primary action, explicit confirmation, honest loading, relative units, and accessible feedback. The explicit physical-card requirement overrides generic advice to remove borders. Apply code-clarity for one authoritative lifecycle, derived XP, scoped ownership, and failure distinctions based on real recovery. Its Electron-specific reference is historical guidance only: translate trust-boundary principles to Tauri, **do not reinstate Electron**.
 

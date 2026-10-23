@@ -18,7 +18,7 @@ HTML imports extract executable JS/CSS, rebase relative CSS URLs, retain executi
 | `bun run format:check`                   | Pass                                                                                                   |
 | `bun run lint:code`, `bun run lint:docs` | ESLint, HTML validation, Stylelint, Markdownlint pass                                                  |
 | `bun run test`                           | 13 policy/import tests pass; zero skipped                                                              |
-| `bun run test:ui`                        | All 9 Chromium tests pass in 12.7 seconds; zero skipped/retried                                        |
+| `bun run test:ui`                        | All 9 Chromium tests pass in 12.4 seconds; zero skipped/retried                                        |
 | `bun run check:sentrux`                  | Sentrux 0.5.7: all 3 strict rules pass; 3 application JS / 12 total first-party JS files; quality 6840 |
 | `bun run bundle`                         | Created `dist/open-loops-preview.tar.gz` with per-file SHA-256 manifest                                |
 
@@ -58,6 +58,10 @@ Old small-card/inside-Back screenshots and earlier 61-check reports are supersed
 
 The proposed native DDL was extracted from the implementation plan and executed in an in-memory SQLite database. An ordinal-0 `steering` Other option, its prompt revision, and its acceptance inserted with valid foreign keys. Duplicate acceptance, a missing option FK, and a generated option mislabeled as steering were rejected. Three JSON examples and the one permission TOML example parsed successfully. These are documentation-contract checks only, not a Tauri build, WKWebView run, Snowflake connection, or Anthropic request.
 
+## OSS documentation follow-up
+
+Community Markdown links and all three issue-template YAML files were checked. The root support documents and GitHub templates are explicit bundle inputs; policy tests cover their rebuild selection, and extracted-bundle link targets were verified. `bunx --help` confirmed `--no-install` on installed Bun 1.4.2. The packaging changes passed the full 9-browser/13-policy suite and unchanged strict Sentrux limits. Licensing, private security contact and maintainer decisions remain explicitly TBD; this is not a licensed open-source release claim.
+
 ## Cleanup and hosted status
 
-Playwright closed its browser contexts/server. The independent delivery tab, diagnostic browser, and their uniquely named local servers were closed; other workers' and user tabs/processes were not touched. Hosted receipts are recorded in [CI.md](../CI.md). Repository visibility now reads public after an unexpected external change, preserved by this workstream. Main protection was subsequently configured and verified: exact required `PR gate`, strict checks, administrators included, and PRs with zero human approvals.
+Playwright closed its browser contexts/server. Owned browser tabs and local servers were closed without touching other sessions. Hosted receipts are in [CI.md](../CI.md). Repository visibility remains public. The current owner-requested hackathon policy keeps `PR gate` for ordinary merges with zero human approvals, but disables the up-to-date requirement and administrator enforcement; owner bypass is possible.

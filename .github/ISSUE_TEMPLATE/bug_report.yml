@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a reproducible problem in the preview, documentation, or tooling.
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, private workspace records, or vulnerability details. Follow SECURITY.md for sensitive reports.
+  - type: textarea
+    id: observed
+    attributes:
+      label: What happened?
+      description: Include the expected result and the observed result.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Use synthetic data and include the command or page involved.
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Commit or branch
+      description: Run git rev-parse HEAD if reporting from a checkout.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, browser, and Node/Bun versions where relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Redacted evidence
+      description: Optional error text or screenshot. Remove tokens, personal records, and private URLs.

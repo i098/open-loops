@@ -49,7 +49,7 @@ Job name: **`PR gate`**. It depends on `detect`, `format`, `lint`, `test`, and `
 - Docs-only PRs still receive the stable gate, while unnecessary browser/Sentrux work skips.
 - Main delivery depends on gate success. No `continue-on-error`, warning-only Sentrux, or fake successful fallback is permitted.
 
-The earlier private-repository protection attempt returned HTTP 403 requiring GitHub Pro or public visibility. After the externally changed visibility cleared that condition, an authorized GET found main unprotected (HTTP 404). The minimal protection policy was then applied and verified by GET: exact required context **`PR gate`**, strict up-to-date checks, enforced for administrators, and pull requests required with **zero human approvals**. No code-owner or extra reviewer policy was added. Force pushes and deletions are disabled. The prior private-repository entitlement blocker is historical; required-gate enforcement is now active. No visibility change or auto-merge was performed.
+Main keeps the exact required context **`PR gate`** and PRs with **zero human approvals** for ordinary merges. At the owner's hackathon request, the up-to-date requirement and administrator enforcement are disabled; administrators can bypass protection. GET verified `strict:false`, `enforce_admins.enabled:false`, the existing required context and zero-approval policy. Force pushes and deletion remain disabled in the rule. No auto-merge or visibility change was made.
 
 ## Untrusted PRs and pins
 
@@ -65,7 +65,7 @@ Node 24 is the CI toolchain; exact npm dev dependencies are committed with a loc
 
 ## Real Sentrux, not a zero-source check
 
-Tool: installed Sentrux **0.5.7**; upstream release `v0.5.7`. The pinned Crewship quality-gates policy is at commit `9897a9c845f7a7cdb3ab2dbb685ec647aa8c10d6`. Its claim that degraded gate exits 2 is outdated for this binary: v0.5.7 degraded/error paths exit 1. **Every nonzero exit is a failure.**
+Tool: installed Sentrux **0.5.7**; upstream release `v0.5.7`. This binary exits nonzero for degraded/error paths. **Every nonzero exit is a failure.**
 
 The research worker proved why a naive check is unsafe:
 
@@ -95,6 +95,8 @@ Do not execute upstream `install.sh`: even at this tag, it discovers `releases/l
 ## Continuous delivery, not assumed hosting
 
 After a successful gate on main, `scripts/bundle.mjs` creates `dist/open-loops-preview.tar.gz` only when packaged inputs change. It contains verified preview files, approved docs, and a per-file SHA-256 manifest bound to the GitHub commit. The workflow uploads `open-loops-preview-<commit>` for **30 days**. PRs produce the same review bundle when previews, packaged docs/README/PLAN, or build/workflow inputs change. Unrelated Markdown outside the bundle does not trigger rebuild. Manual dispatch is an explicit override once the workflow exists on the default branch.
+
+The bundle also includes the root contribution, security, support, conduct, changelog and credits documents, plus issue forms and the PR template. Their paths are packaged inputs in `ci-scope.mjs`, so README links remain usable after extraction and changes to these documents trigger an updated artifact. This packaging policy does not select browser/Sentrux work for document-only changes; changes to the packaging scripts themselves select the full gates.
 
 This is an actual downloadable artifact, not an unconfigured deployment promise. It is **continuous delivery of the browser preview**. No Pages URL, native installer, public website, or GitHub Release is claimed. Pages may be considered later only if private-repository/account capabilities and intended audience are verified. GitHub Actions artifact access follows repository permissions; public disclosure is not the default.
 
