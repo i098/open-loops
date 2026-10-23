@@ -19,7 +19,13 @@ export function selectChecks(paths) {
     test: all || paths.some((path) => /^(?:previews\/|tests\/)/.test(path)),
     sentrux:
       all || paths.some((path) => /^(?:previews\/|tests\/).+\.(?:html|css|js|mjs|cjs)$/.test(path)),
-    bundle: all || paths.some((path) => /^(?:previews\/|docs\/|README\.md$|PLAN\.md$)/.test(path)),
+    bundle:
+      all ||
+      paths.some((path) =>
+        /^(?:previews\/|docs\/|\.github\/(?:ISSUE_TEMPLATE\/|PULL_REQUEST_TEMPLATE\.md$)|(?:README|PLAN|CONTRIBUTING|SECURITY|SUPPORT|CODE_OF_CONDUCT|CHANGELOG|CREDITS)\.md$)/.test(
+          path,
+        ),
+      ),
   };
 }
 

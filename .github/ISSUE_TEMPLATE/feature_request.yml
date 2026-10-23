@@ -1,0 +1,22 @@
+name: Feature request
+description: Describe a problem and a bounded change that would help.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What cannot you do today? Name the affected preview or workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the result you want, without assuming an unimplemented native integration exists.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints or alternatives
+      description: Include relevant privacy, permission, accessibility, or compatibility requirements. Do not include secrets.

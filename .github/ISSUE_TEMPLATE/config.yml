@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Support and project status
+    url: https://github.com/i098/open-loops/blob/main/SUPPORT.md
+    about: Read the supported scope before opening a non-sensitive question.
+  - name: Security reporting guidance
+    url: https://github.com/i098/open-loops/blob/main/SECURITY.md
+    about: Do not post vulnerability details or credentials in public issues.

@@ -22,7 +22,20 @@ mkdirSync(output, { recursive: true });
 const temporary = mkdtempSync(join(output, 'bundle-'));
 const stage = join(temporary, 'open-loops-preview');
 mkdirSync(stage);
-for (const path of ['previews', 'docs', 'README.md', 'PLAN.md']) {
+for (const path of [
+  'previews',
+  'docs',
+  'README.md',
+  'PLAN.md',
+  'CONTRIBUTING.md',
+  'SECURITY.md',
+  'SUPPORT.md',
+  'CODE_OF_CONDUCT.md',
+  'CHANGELOG.md',
+  'CREDITS.md',
+  '.github/ISSUE_TEMPLATE',
+  '.github/PULL_REQUEST_TEMPLATE.md',
+]) {
   cpSync(join(root, path), join(stage, path), { recursive: true, dereference: false });
 }
 
