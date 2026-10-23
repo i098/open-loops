@@ -1,0 +1,46 @@
+flowchart TD
+  accTitle: Proposed onboarding UI tree — simulated, not native permissions
+  %% Same decision deck hosts setup; independent info owns scan status below buddy.
+  %% Browser events/permissions are simulated; native transitions require real evidence.
+  W["Welcome<br/>First-run companion"]
+  C["Connect work data<br/>Preview credentials / source selection"]
+  A{"Access check"}
+  V["Access verified<br/>Approved source scope"]
+  F["Connection failed<br/>Fix access or retry"]
+  AX["Optional app context<br/>Accessibility permission screen"]
+  AXA["Allow selected app context<br/>Simulated choice only"]
+  AXS["Skip app context<br/>Manual / data-only operation"]
+  SS["Optional screenshot context<br/>Separate Screen Recording permission screen"]
+  SSA["Allow screenshots<br/>Still requires per-image preview / send consent"]
+  SSS["Skip screenshots<br/>No capture"]
+  START["Start first scan<br/>Explicit action; no XP"]
+  STREAM["Streaming activity<br/>Simulated events; no workspace connected"]
+  WORK["Keep working<br/>Collapse companion; retain scan state"]
+  REOPEN["Reopen companion<br/>Restore activity / current quest"]
+  READY["First complete card pack ready<br/>Review now while scan continues"]
+  DECK["Same decision card<br/>Stored options / prompt editor / explicit handoff"]
+  EMPTY["No quests found<br/>Only after successful scan completion"]
+  PART["Some quests ready; scan incomplete<br/>Review available quests + retry failed source"]
+  FAIL["Scan could not finish<br/>No quests ready; fix access / retry"]
+  W --> C --> A
+  A -->|verified| V --> AX
+  A -->|failure| F --> C
+  AX --> AXA --> SS
+  AX --> AXS --> SS
+  SS --> SSA --> START
+  SS --> SSS --> START
+  START --> STREAM
+  STREAM -->|keep working| WORK --> REOPEN
+  REOPEN --> STREAM
+  STREAM -->|first quest_ready| READY --> DECK
+  STREAM -->|complete with zero quests| EMPTY
+  STREAM -->|some sources failed| PART
+  STREAM -->|all sources failed| FAIL
+  PART -->|review| DECK
+  PART -->|retry failed source| STREAM
+  FAIL -->|fix access| C
+  FAIL -->|retry| STREAM
+  classDef screen fill:#fcfcf7,stroke:#73836a,color:#27332d
+  classDef failure fill:#f7efdf,stroke:#a58a56,color:#503f22
+  class W,C,V,AX,AXA,AXS,SS,SSA,SSS,START,STREAM,WORK,REOPEN,READY,DECK,EMPTY screen
+  class F,PART,FAIL failure

@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en" data-theme="silk" data-lavish-annotate="on">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Open Loops — your desktop buddy</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+    <link rel="stylesheet" href="assets/open-loops.css" />
+  </head>
+  <body>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="0"
+      height="0"
+      style="position: absolute; overflow: hidden"
+      aria-hidden="true"
+    >
+      <defs>
+        <symbol id="pip-idle" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path fill="#4b485b" d="M15 12V8h2V6h4v4h-2v2zM11 24h4v4H9v-2h2zm7 0h4v2h2v2h-6z" />
+            <path fill="#9fbf99" d="M17 8h3v1h-2v2h-1z" />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M12 11h8v2h3v3h2v7h-2v3H11v-2H8V15h2v-2h2zM14 15v4h5v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M12 13h8v2h3v8h-2v2H11v-3H10v-7h2zM13 14v6h7v-6z"
+            />
+            <path fill="#9484b5" d="M21 16h2v7h-2v2H11v-2h9v-3h1z" />
+            <path fill="#fff6e4" d="M12 14h1v4h-2v-3h1zm3-1h4v1h-4z" />
+            <path fill="#4b485b" d="M12 21h2v2h-2zm6 0h2v2h-2zm-3 2h2v1h-2z" />
+            <path fill="#e8b49c" d="M10 23h2v1h-2zm10 0h2v1h-2z" />
+          </g>
+        </symbol>
+        <symbol id="pip-blink" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path fill="#4b485b" d="M15 12V8h2V6h4v4h-2v2zM11 24h4v4H9v-2h2zm7 0h4v2h2v2h-6z" />
+            <path fill="#9fbf99" d="M17 8h3v1h-2v2h-1z" />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M12 11h8v2h3v3h2v7h-2v3H11v-2H8V15h2v-2h2zM14 15v4h5v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M12 13h8v2h3v8h-2v2H11v-3H10v-7h2zM13 14v6h7v-6z"
+            />
+            <path fill="#9484b5" d="M21 16h2v7h-2v2H11v-2h9v-3h1z" />
+            <path fill="#fff6e4" d="M12 14h1v4h-2v-3h1zm3-1h4v1h-4z" />
+            <path fill="#4b485b" d="M11 22h3v1h-3zm7 0h3v1h-3zm-3 1h2v1h-2z" />
+            <path fill="#e8b49c" d="M10 23h2v1h-2zm10 0h2v1h-2z" />
+          </g>
+        </symbol>
+        <symbol id="pip-celebrate" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path
+              fill="#9fbf99"
+              d="M6 8h2v2h2v2H8v2H6v-2H4v-2h2zm19 1h2v2h2v2h-2v2h-2v-2h-2v-2h2z"
+            />
+            <path
+              fill="#4b485b"
+              d="M15 10V5h2V3h4v4h-2v3zM8 20H5v-2H3v-4h3v3h4zm15 0h4v-3h2v-4h-3v3h-3zM11 24h4v3h-5v-1h1zm7 0h4v1h2v2h-6z"
+            />
+            <path fill="#9fbf99" d="M17 5h3v1h-2v3h-1z" />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M12 9h8v2h3v3h2v7h-2v3H11v-2H8V13h2v-2h2zM14 13v4h5v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M12 11h8v2h3v8h-2v2H11v-3H10v-7h2zM13 12v6h7v-6z"
+            />
+            <path fill="#9484b5" d="M21 14h2v7h-2v2H11v-2h9v-3h1z" />
+            <path fill="#fff6e4" d="M12 12h1v4h-2v-3h1zm3-1h4v1h-4z" />
+            <path fill="#4b485b" d="M11 20v-1h1v-1h1v1h1v1zm7 0v-1h1v-1h1v1h1v1zm-3 0h2v2h-2z" />
+            <path fill="#e8b49c" d="M10 21h2v1h-2zm10 0h2v1h-2z" />
+          </g>
+        </symbol>
+        <symbol id="scout-idle" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path
+              fill="#4b485b"
+              d="M10 12V7H7V3h5v3h1v6zm10 0V7h2V3h4v4h-2v3h-1v2zM8 24h5v5H6v-3h2zm11 0h5v2h3v3h-8zM7 16H4v3H3v4h3v-4h2zm18 0h3v3h1v3h-3v-3h-2z"
+            />
+            <path fill="#9fbf99" d="M8 4h3v2H8zm15 0h2v2h-2zM8 27h4v1H8zm12 0h4v1h-4z" />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M11 9h10v2h3v3h2v9h-2v3H8v-3H6V14h2v-3h3zM12 13v4h8v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M11 11h10v2h3v10h-2v2H10v-2H8V14h3zM11 12v6h10v-6z"
+            />
+            <path fill="#9484b5" d="M22 14h2v9h-2v2H10v-2h11v-4h1z" />
+            <path fill="#fff6e4" d="M9 14h2v4H9zm4-3h6v1h-6z" />
+            <path fill="#4b485b" d="M11 19h2v3h-2zm8 0h2v3h-2zm-5 3h4v1h-4z" />
+            <path fill="#e8b49c" d="M9 22h2v1H9zm12 0h2v1h-2z" />
+            <path fill="#627f70" d="M6 14h3v7H6zm2 7h2v4H8z" />
+            <path fill="#9fbf99" d="M6 15h2v4H6z" />
+          </g>
+        </symbol>
+        <symbol id="scout-blink" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path
+              fill="#4b485b"
+              d="M10 12V7H7V3h5v3h1v6zm10 0V7h2V3h4v4h-2v3h-1v2zM8 24h5v5H6v-3h2zm11 0h5v2h3v3h-8zM7 16H4v3H3v4h3v-4h2zm18 0h3v3h1v3h-3v-3h-2z"
+            />
+            <path fill="#9fbf99" d="M8 4h3v2H8zm15 0h2v2h-2zM8 27h4v1H8zm12 0h4v1h-4z" />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M11 9h10v2h3v3h2v9h-2v3H8v-3H6V14h2v-3h3zM12 13v4h8v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M11 11h10v2h3v10h-2v2H10v-2H8V14h3zM11 12v6h10v-6z"
+            />
+            <path fill="#9484b5" d="M22 14h2v9h-2v2H10v-2h11v-4h1z" />
+            <path fill="#fff6e4" d="M9 14h2v4H9zm4-3h6v1h-6z" />
+            <path fill="#4b485b" d="M10 21h4v1h-4zm8 0h4v1h-4zm-4 1h4v1h-4z" />
+            <path fill="#e8b49c" d="M9 22h2v1H9zm12 0h2v1h-2z" />
+            <path fill="#627f70" d="M6 14h3v7H6zm2 7h2v4H8z" />
+            <path fill="#9fbf99" d="M6 15h2v4H6z" />
+          </g>
+        </symbol>
+        <symbol id="scout-celebrate" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path fill="#9fbf99" d="M3 3h2v2h2v2H5v2H3V7H1V5h2zm25 0h2v3h-2z" />
+            <path
+              fill="#4b485b"
+              d="M10 10V5H8V1h5v4h1v5zm10 0V6h2V1h4v4h-2v3h-1v2zM7 16H4v-3H2V9h3v3h3zm18 0h3v-3h2V9h-3v3h-3zM9 22h5v4h-3v2H6v-3h3zm10 0h5v2h3v3h-5v-1h-3z"
+            />
+            <path fill="#9fbf99" d="M9 2h3v2H9zm14 0h2v2h-2zM8 26h3v1H8zm14-2h3v2h-3z" />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M11 7h10v2h3v3h2v9h-2v3H8v-3H6V12h2V9h3zM12 11v4h8v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M11 9h10v2h3v10h-2v2H10v-2H8V12h3zM11 10v6h10v-6z"
+            />
+            <path fill="#9484b5" d="M22 12h2v9h-2v2H10v-2h11v-4h1z" />
+            <path fill="#fff6e4" d="M9 12h2v4H9zm4-3h6v1h-6z" />
+            <path fill="#4b485b" d="M10 19v-1h1v-1h2v1h1v1zm8 0v-1h1v-1h2v1h1v1zm-4 0h4v3h-4z" />
+            <path fill="#e8b49c" d="M9 20h2v1H9zm12 0h2v1h-2zm-6 1h2v1h-2z" />
+            <path fill="#627f70" d="M6 12h3v7H6zm2 7h2v4H8z" />
+            <path fill="#9fbf99" d="M6 13h2v4H6z" />
+          </g>
+        </symbol>
+        <symbol id="guide-idle" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path
+              fill="#4b485b"
+              d="M9 12V9H6V4h4v2h3V2h5v3h2V4h5v5h-3v3zM23 21h3v3h2v-4h3v7h-2v2h-6v-2h-2zM8 24h6v6H6v-3h2zm10 0h6v3h2v3h-8zM6 18H3v5h3zm20-1h2v4h-2z"
+            />
+            <path fill="#627f70" d="M24 24h3v3h2v-6h1v5h-2v2h-4zM8 27h5v2H8zm11 0h5v2h-5z" />
+            <path
+              fill="#9fbf99"
+              d="M7 5h2v2h3v3H9V8H7zm7-2h3v3h2v4h-4V7h-1zm7 2h3v3h-3v2h-2V7h2z"
+            />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M10 9h12v2h3v3h2v9h-2v4H7v-4H5v-9h2v-3h3zM11 13v4h10v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M10 11h12v2h3v10h-2v2H9v-2H7v-9h3zM10 12v6h12v-6z"
+            />
+            <path fill="#9484b5" d="M23 14h2v9h-2v2H9v-2h12v-3h2z" />
+            <path fill="#fff6e4" d="M8 14h2v4H8zm4-3h8v1h-8z" />
+            <path fill="#627f70" d="M6 18h3v6h3v2H8v-2H6zm18 0h2v6h-2z" />
+            <path fill="#9fbf99" d="M7 19h2v3H7zm17 0h1v3h-1z" />
+            <path fill="#4b485b" d="M11 19h2v3h-2zm8 0h2v3h-2zm-5 3h1v1h2v-1h1v2h-4z" />
+            <path fill="#e8b49c" d="M9 22h2v1H9zm12 0h2v1h-2z" />
+          </g>
+        </symbol>
+        <symbol id="guide-blink" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path
+              fill="#4b485b"
+              d="M9 12V9H6V4h4v2h3V2h5v3h2V4h5v5h-3v3zM23 21h3v3h2v-4h3v7h-2v2h-6v-2h-2zM8 24h6v6H6v-3h2zm10 0h6v3h2v3h-8zM6 18H3v5h3zm20-1h2v4h-2z"
+            />
+            <path fill="#627f70" d="M24 24h3v3h2v-6h1v5h-2v2h-4zM8 27h5v2H8zm11 0h5v2h-5z" />
+            <path
+              fill="#9fbf99"
+              d="M7 5h2v2h3v3H9V8H7zm7-2h3v3h2v4h-4V7h-1zm7 2h3v3h-3v2h-2V7h2z"
+            />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M10 9h12v2h3v3h2v9h-2v4H7v-4H5v-9h2v-3h3zM11 13v4h10v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M10 11h12v2h3v10h-2v2H9v-2H7v-9h3zM10 12v6h12v-6z"
+            />
+            <path fill="#9484b5" d="M23 14h2v9h-2v2H9v-2h12v-3h2z" />
+            <path fill="#fff6e4" d="M8 14h2v4H8zm4-3h8v1h-8z" />
+            <path fill="#627f70" d="M6 18h3v6h3v2H8v-2H6zm18 0h2v6h-2z" />
+            <path fill="#9fbf99" d="M7 19h2v3H7zm17 0h1v3h-1z" />
+            <path fill="#4b485b" d="M10 21h4v1h-4zm8 0h4v1h-4zm-4 1h1v1h2v-1h1v2h-4z" />
+            <path fill="#e8b49c" d="M9 22h2v1H9zm12 0h2v1h-2z" />
+          </g>
+        </symbol>
+        <symbol id="guide-celebrate" viewBox="0 0 32 32">
+          <g shape-rendering="crispEdges">
+            <path fill="#c8b7e6" d="M3 2h2v2h2v2H5v2H3V6H1V4h2zM27 1h2v2h2v2h-2v2h-2V5h-2V3h2z" />
+            <path
+              fill="#4b485b"
+              d="M9 10V7H6V2h4v2h3V1h5v2h2V2h5v5h-3v3zM23 21h3v2h2v-5h3v8h-2v2h-6v-2h-2zM8 24h6v5H6v-3h2zm10 0h6v2h2v3h-8zM6 17H3v-3H1v-4h3v3h4zm19 0h3v-4h3V9h-3v3h-4z"
+            />
+            <path fill="#627f70" d="M24 23h3v3h2v-7h1v6h-2v2h-4zM8 26h5v2H8zm11 0h5v2h-5z" />
+            <path
+              fill="#9fbf99"
+              d="M7 3h2v2h3v3H9V6H7zM14 2h3v2h2v4h-4V5h-1zM21 3h3v3h-3v2h-2V5h2z"
+            />
+            <path
+              fill="#4b485b"
+              fill-rule="evenodd"
+              d="M10 7h12v2h3v3h2v9h-2v4H7v-4H5v-9h2V9h3zM11 11v4h10v-4z"
+            />
+            <path
+              fill="#c8b7e6"
+              fill-rule="evenodd"
+              d="M10 9h12v2h3v10h-2v2H9v-2H7v-9h3zM10 10v6h12v-6z"
+            />
+            <path fill="#9484b5" d="M23 12h2v9h-2v2H9v-2h12v-3h2z" />
+            <path fill="#fff6e4" d="M8 12h2v4H8zm4-3h8v1h-8z" />
+            <path fill="#627f70" d="M6 16h3v6h3v2H8v-2H6zm18 0h2v6h-2z" />
+            <path fill="#9fbf99" d="M7 17h2v3H7zm17 0h1v3h-1z" />
+            <path fill="#4b485b" d="M10 19v-1h1v-1h2v1h1v1zm8 0v-1h1v-1h2v1h1v1zm-4 0h4v3h-4z" />
+            <path fill="#e8b49c" d="M9 20h2v1H9zm12 0h2v1h-2zm-6 1h2v1h-2z" />
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+    <main class="page">
+      <header class="review-header">
+        <strong>Open Loops</strong>
+        <nav class="review-links" aria-label="Preview navigation">
+          <a class="text-button" href="personal-observability.html">My day</a
+          ><button
+            class="text-button"
+            id="review-toggle"
+            aria-expanded="false"
+            aria-controls="review-view"
+          >
+            Design &amp; architecture
+          </button>
+        </nav>
+      </header>
+      <section class="stage" id="product-view" aria-label="Companion preview">
+        <aside class="idle-hint" id="idle-hint" hidden>
+          <p>A loose end is waiting, whenever you have a moment.</p>
+          <div class="hint-actions">
+            <button class="text-button" id="dismiss-hint">Dismiss</button
+            ><button class="text-button" id="snooze-hint">Later</button>
+          </div>
+        </aside>
+        <section
+          class="buddy-panel"
+          id="buddy-panel"
+          role="dialog"
+          aria-modal="false"
+          aria-label="Open Loops"
+          aria-describedby="preview-description"
+          hidden
+        >
+          <section class="info-card" id="info-card" aria-label="Current quest info">
+            <div class="info-top">
+              <span class="platform-preview">Preview</span>
+              <div class="info-controls">
+                <button
+                  class="icon-button"
+                  id="sound-toggle"
+                  aria-label="Mute sounds"
+                  title="Mute sounds"
+                  aria-pressed="false"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    aria-hidden="true"
+                  >
+                    <path d="M8 6H4v8h4l5 3V3L8 6Z" />
+                    <path d="M16 6c2 2 2 6 0 8" />
+                  </svg></button
+                ><button class="icon-button" id="close-panel" aria-label="Close Open Loops">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    aria-hidden="true"
+                  >
+                    <path d="m5 5 10 10M15 5 5 15" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="info-meta">
+              <button class="info-count" id="info-count" data-do="activity">Setup preview</button
+              ><span id="info-age">Not connected</span>
+            </div>
+            <div class="xp-footer">
+              <div
+                id="scan-progress"
+                class="scan-progress"
+                role="progressbar"
+                aria-label="First scan in progress"
+                hidden
+              >
+                <span></span>
+              </div>
+              <div
+                class="xp-track"
+                id="xp-track"
+                role="progressbar"
+                aria-label="Accepted quest XP"
+                aria-valuemin="0"
+                aria-valuenow="0"
+                aria-valuemax="20"
+              >
+                <span id="xp-progress"></span>
+              </div>
+              <p class="xp-line" id="demo-xp">0 XP · Scout at 20</p>
+              <span id="evolution-label" class="sr-only">Pip</span>
+            </div>
+          </section>
+          <div class="deck-component" id="deck-component">
+            <div class="panel-body" id="panel-body"></div>
+            <footer class="pocket-actions" id="pocket-actions"></footer>
+          </div>
+          <span class="sr-only" id="preview-description"
+            >Browser prototype. No live connections, screen capture or agent requests.</span
+          >
+        </section>
+        <div class="buddy-dock" id="buddy-dock">
+          <button
+            class="buddy-toggle"
+            id="buddy-toggle"
+            aria-label="Open Open Loops, 3 quests waiting"
+            aria-expanded="false"
+            aria-controls="buddy-panel"
+          >
+            <span class="closed-sprite-slot" id="closed-sprite-slot"
+              ><svg id="buddy-art" class="sprite-art" viewBox="0 0 32 32" aria-hidden="true">
+                <use id="sprite-use" href="#pip-idle" /></svg></span
+            ><span class="need-pill" id="need-pill">3</span>
+          </button>
+        </div>
+      </section>
+      <p class="sr-only" id="demo-status" role="status"></p>
+      <section class="review-view" id="review-view" hidden>
+        <h1 class="sr-only">Design and proposed execution architecture</h1>
+        <details class="review-controls">
+          <summary>Preview controls</summary>
+          <div class="review-control-buttons">
+            <button class="button" id="reset-all">Reset preview</button
+            ><button class="button" id="demo-idle">Simulate 5 minutes idle</button>
+          </div>
+          <label class="setup-mode" for="setup-outcome">First-scan fixture</label
+          ><select id="setup-outcome" class="select">
+            <option value="success">Progressive sample quests</option>
+            <option value="empty">Complete with no quests</option>
+            <option value="failure">Recoverable permission failure</option>
+            <option value="partial">Partial failure with one ready quest</option>
+          </select>
+        </details>
+        <details class="build-notes" id="build-notes">
+          <summary>Build notes <span>4-hour slice · safeguards · metrics</span></summary>
+          <div class="notes-grid">
+            <section>
+              <h3>Scope and proposed host</h3>
+              <p>
+                Swipes choose a delay or a task; only explicit quest acceptance earns XP. This
+                preview uses fixtures. The proposed macOS host is Tauri v2: a restricted WebView,
+                Rust-owned commands/state, a packaged Swift AX/ScreenCaptureKit helper, SQLite
+                memory, Keychain credentials and one approved provider. Custom commands require
+                AppManifest permissions plus per-window capabilities and Rust validation. The
+                Mermaid view gives the executable build order; none of those native integrations
+                exists in this HTML.
+              </p>
+            </section>
+            <section>
+              <h3>240 minutes, not a roadmap</h3>
+              <ol>
+                <li>
+                  <strong>0–25 · 25 min:</strong> access, source request, evidence and
+                  write-destination gate. If missing, stay in fixtures.
+                </li>
+                <li>
+                  <strong>25–70 · 45 min:</strong> bounded Snowflake view, provenance and owner.
+                </li>
+                <li>
+                  <strong>70–150 · 80 min:</strong> buddy, choices, exact preview, confirm/cancel,
+                  receipt.
+                </li>
+                <li>
+                  <strong>150–195 · 45 min:</strong> visible-session idle badge and measurement.
+                </li>
+                <li>
+                  <strong>195–240 · 45 min:</strong> keyboard/mobile, success, stale evidence,
+                  permission denial and failed-write proof.
+                </li>
+              </ol>
+            </section>
+            <section>
+              <h3>Read access is not write access</h3>
+              <p>
+                Snowflake is a replicated <strong>read layer</strong>. A live action needs an
+                existing authorized source API, explicit human approval, current source
+                status/version, and scoped permission. Re-check immediately before writing. Already
+                closed, changed, or missing evidence means stop. Use a stable action ID; reconcile a
+                timeout before retrying.
+                <strong>Only source success plus authoritative readback proves closure.</strong>
+              </p>
+              <label class="scenario-label" for="source-result"
+                >Fixture response for source actions</label
+              ><select class="select select-bordered" id="source-result">
+                <option value="success">Simulated success + readback</option>
+                <option value="denied">Permission denied</option>
+                <option value="changed">Stale evidence / changed record</option>
+                <option value="failed">Write failed / timeout</option>
+                <option value="missing">Missing evidence</option>
+              </select>
+            </section>
+            <section>
+              <h3>Measure the actual question-to-decision</h3>
+              <p>
+                <strong>Time question to decision:</strong>
+                <span class="mono">decision_confirmed_at − question_submitted_at</span>, wall-clock
+                seconds from question submission through evidence retrieval, reading and explicit
+                confirmation. Median/p90, split by action. Cancellations separate; execution latency
+                separate; simulations excluded.
+              </p>
+              <p class="metric">
+                <strong>Stale requests closed per week:</strong> distinct source request IDs at
+                least 30 days old since creation, open before action, authoritatively confirmed
+                closed by the agent in a Monday–Sunday UTC week. Exclude simulations, already-closed
+                records, deferrals, failed/unverified writes and reopened requests; deduplicate
+                retries.
+              </p>
+            </section>
+          </div>
+          <p class="disclaimer">
+            Category: Something that makes the business run better — faster question-to-decision
+            workflows. No observed productivity gain claimed. Design: Tailwind v4 + DaisyUI v5
+            fallback; no existing app supplied.
+          </p>
+        </details>
+        <details id="architecture-view" class="build-notes architecture-view">
+          <summary>Execution architecture <span>Tauri proposal · Mermaid diagrams</span></summary>
+          <p class="small muted">
+            Proposed only. This preview uses simulated data and permissions.
+          </p>
+          <div id="architecture-status" class="small muted" role="status">
+            Open to render the diagrams.
+          </div>
+          <section class="architecture-section">
+            <h3>1. Tauri ownership and My day</h3>
+            <div class="architecture-scroll"><pre class="architecture-figure"></pre></div>
+            <script type="text/plain" class="architecture-source">
+              flowchart TB
+                accTitle: Proposed Tauri macOS ownership
+                UI["Existing index.html + buddy.js<br/>System WebView; listen before start<br/>No secrets, shell, SQL or native APIs"]
+                DAY["Optional My day dashboard WebView<br/>Read-only history and memory provenance<br/>No secrets or separate telemetry store"]
+                ACL["src-tauri/build.rs<br/>AppManifest::commands permissions<br/>capabilities/default.json: per-window allowlist"]
+                CMD["src-tauri/src/commands.rs<br/>Narrow typed commands<br/>Validate arguments AND window origin"]
+                CORE["src-tauri/src/lib.rs + jobs.rs<br/>Rust async runtime; bootstrap job owner<br/>Dedup, checkpoint, approvals, retention/capture controls"]
+                CTX["src-tauri/src/context.rs<br/>Bounded normalize, debounce, diffs<br/>Unsupported AX content stays unknown"]
+                NATIVE["native/ContextObserver.swift<br/>AXObserver + AXUIElement: one allowed app<br/>Optional ScreenCaptureKit selected-window still"]
+                DB[("Same Rust-owned SQLite via store.rs<br/>Activity timestamps, observed/inferred provenance<br/>Memory refs, jobs, checkpoints, snoozes, acceptance XP<br/>Verified closure stored separately from XP")]
+                RAM["Short-lived RAM<br/>Raw screenshot + working context<br/>Discard images after consented use"]
+                KEY["macOS Keychain<br/>Narrow Rust/native credential API<br/>Does not encrypt SQLite"]
+                SF["Snowflake HTTP / read-only views<br/>Fixed parameterized queries<br/>Actor and row authorization"]
+                P["ONE approved Claude OR GPT provider<br/>Bounded read/draft tool loop<br/>Model has no direct write authority"]
+                SRC["Optional authorized source API<br/>Existing connector only<br/>Fresh approval, write, authoritative readback"]
+                UI <-->|"invoke + sequenced events / snapshot"| CMD
+                DAY <-->|"narrow read-only commands; per-window capability"| CMD
+                ACL -.->|"custom commands are NOT restricted by default"| CMD
+                CMD <-->|"validated intent only"| CORE
+                CORE <-->|"checkpoint before emit"| DB
+                CORE <-->|"minimal working context"| RAM
+                KEY -->|"Rust only"| CORE
+                CORE -->|"spawn only packaged helper; no frontend shell"| NATIVE
+                NATIVE -->|"bounded validated JSON lines"| CTX
+                CTX --> CORE
+                CORE <-->|"fresh scoped reads"| SF
+                CORE <-->|"approved context only"| P
+                CORE <-->|"second approval + status/version check"| SRC
+                classDef local fill:#edf1e9,stroke:#73836a,color:#253124
+                classDef external fill:#f2edf8,stroke:#8b7aab,color:#30263d
+                class CMD,CORE,CTX,DB,RAM local
+                class SF,P,SRC external
+            </script>
+          </section>
+          <section class="architecture-section">
+            <h3>2. First sync and runtime</h3>
+            <div class="architecture-scroll"><pre class="architecture-figure"></pre></div>
+            <script type="text/plain" class="architecture-source">
+              sequenceDiagram
+                accTitle: Tauri bootstrap and task runtime
+                participant U as Person
+                participant UI as WebView frontend
+                participant R as Rust async owner
+                participant DB as SQLite
+                participant H as Swift helper
+                participant SF as Snowflake views
+                participant P as One approved provider
+                participant S as Source API
+                UI->>R: Register event listener, then request status snapshot
+                R->>DB: Load bootstrap job, last seq and checkpoint
+                R-->>UI: Snapshot including partial quests and terminal status
+                opt First install or explicit retry
+                  UI->>R: start_bootstrap with stable job ID
+                  R->>R: Dedup and validate approved credentials and source scope
+                  R->>DB: Persist running job before work
+                  R->>SF: Connect and fetch bounded first batch
+                  R->>DB: Checkpoint source_connection and batch_loaded
+                  R-->>UI: Events with job_id, seq, timestamp, observed counts
+                  loop Bounded batches
+                    R->>DB: Checkpoint analyzing_batch
+                    R-->>UI: analyzing_batch event
+                    R->>R: Extract candidate quest from actual evidence
+                    R->>DB: Upsert stable quest ID and checkpoint
+                    R-->>UI: quest_created event, card usable immediately
+                  end
+                  alt Source failure after zero or some quests
+                    R->>DB: Persist failed status and retry checkpoint
+                    R-->>UI: failed event, retain any ready quests
+                  else Scan completes, including zero quests
+                    R->>DB: Persist completed status and final count
+                    R-->>UI: completed event, empty is distinct from processing
+                  end
+                end
+                Note over UI,DB: Popup close does not stop Rust job. Reopen reconciles snapshot plus seq
+                Note over R,DB: App restart resumes checkpoint. No work runs while process is stopped
+                opt Person enables local app context
+                  U->>R: Allow one app and grant Accessibility permission
+                  R->>H: Start packaged helper with bounded configuration
+                  H-->>R: Supported AX event / focus delta as JSON line
+                  R->>DB: Useful summary + source refs + timestamp
+                end
+                R->>R: OS idle reaches 300 seconds
+                R->>DB: Fetch due quests and FTS matches by person/ID/recency
+                R->>SF: Refresh scoped read-only evidence
+                R-->>UI: Quiet badge, never auto-open or dispatch
+                U->>UI: Open a quest
+                alt Swipe left
+                  UI-->>U: Three snooze durations
+                  U->>UI: Choose duration
+                  UI->>R: Snooze quest until timestamp
+                  R->>DB: Persist snoozed_until, no model call or XP
+                else Swipe right
+                  UI-->>U: Two or three scoped task choices
+                  opt Explicit optional screenshot
+                    U->>R: Select allowed window, separate Screen Recording consent
+                    R->>H: Capture one ScreenCaptureKit still
+                    H-->>R: Local image only
+                    R-->>UI: Preview and masking
+                    U->>UI: Approve exact image and approved destination
+                  end
+                  UI-->>U: Exact brief, evidence, limits, destination
+                  U->>UI: Accept quest
+                  UI->>R: Confirm stable quest and job ID
+                  R->>DB: Atomic acceptance + queued job + 10 XP once
+                  loop Bounded read/draft tool loop
+                    R->>P: Minimal approved context
+                    P-->>R: Draft or allowed read request
+                    R->>SF: Validate and run fixed read if requested
+                    SF-->>R: Scoped evidence
+                  end
+                  R->>DB: Result-ready or failed, retain job identity
+                  R-->>UI: Prepared result, not source success
+                  opt Separate source mutation
+                    U->>UI: Fresh approval of exact target and payload
+                    UI->>R: Approved source action
+                    R->>S: Recheck actor permission and current status/version
+                    alt Authorized, current, evidence sufficient
+                      R->>S: Write with stable action ID
+                      R->>S: Authoritative readback
+                      S-->>R: Confirmed state or unverified outcome
+                      R-->>UI: Verified receipt only on matching success
+                    else Denied, stale, missing or timeout
+                      R-->>UI: No closure claimed, reconcile before retry
+                    end
+                  end
+                end
+            </script>
+          </section>
+          <section class="architecture-section">
+            <h3>3. Build order and test gates</h3>
+            <div class="architecture-scroll"><pre class="architecture-figure"></pre></div>
+            <script type="text/plain" class="architecture-source">
+              flowchart TD
+                accTitle: Tauri vertical slices and test gates
+                G{"Prerequisite gate<br/>macOS + signing + one allowed app<br/>Approved Snowflake and ONE provider credentials<br/>Source connector separately authorized?"}
+                F["Missing prerequisite<br/>Keep labeled fixtures / unavailable live operation<br/>No invented connection or sync result"]
+                A["1. Host existing frontend<br/>src-tauri/src/lib.rs + commands.rs<br/>src-tauri/build.rs: AppManifest::commands<br/>capabilities/default.json per-window permissions<br/>Gate: deny unknown command/window/args; no shell or secrets in UI"]
+                B["2. Durable local state and bootstrap<br/>store.rs: rusqlite schema + FTS + checkpoints<br/>jobs.rs: async job + seq/event + snapshot/replay<br/>Gate: first card before complete; zero/empty/failure distinct<br/>Close/reopen and restart dedup; unique acceptance XP"]
+                C["3. One real read/draft path<br/>context.rs + jobs.rs + fixed Snowflake HTTP reads<br/>ONE provider; bounded read/draft tools<br/>Gate: actor scope, prompt injection, retries, cancellation<br/>Fresh human approval remains separate"]
+                H["Optional native context slice<br/>native/ContextObserver.swift<br/>tauri.conf.json externalBin + target-suffixed binary<br/>Rust spawns packaged helper only<br/>Gate: signed app/helper TCC identity; AX denial/unknown content"]
+                I["Optional screenshot slice<br/>ScreenCaptureKit in the same helper<br/>Separate permission + local preview/mask + send consent<br/>Gate: denial, discard, expiry; no continuous upload"]
+                W["Optional source-write slice<br/>Rust-only authorized connector<br/>Gate: exact approval, permission/status recheck<br/>Timeout reconciliation and verified readback"]
+                T["One narrow executable workflow<br/>No new backend, queue service, WebSocket bus,<br/>vector DB, arbitrary shell or provider framework"]
+                G -->|"missing"| F
+                G -->|"approved"| A
+                A --> B --> C --> T
+                B --> H --> I
+                I -->|"approved minimal context"| C
+                C -->|"existing connector authorized"| W
+                W --> T
+                classDef gate fill:#f7efdf,stroke:#a58a56,color:#3c3220
+                classDef slice fill:#edf1e9,stroke:#73836a,color:#253124
+                class G,F gate
+                class A,B,C,H,I,W,T slice
+            </script>
+          </section>
+          <section class="architecture-section">
+            <h3>4. Onboarding UI tree</h3>
+            <div class="architecture-scroll"><pre class="architecture-figure"></pre></div>
+            <script type="text/plain" class="architecture-source">
+              flowchart TD
+                accTitle: Proposed onboarding UI tree — simulated, not native permissions
+                W["Welcome<br/>First-run companion"]
+                C["Connect work data<br/>Preview credentials / source selection"]
+                A{"Access check"}
+                V["Access verified<br/>Approved source scope"]
+                F["Connection failed<br/>Fix access or retry"]
+                AX["Optional app context<br/>Accessibility permission screen"]
+                AXA["Allow selected app context<br/>Simulated choice only"]
+                AXS["Skip app context<br/>Manual / data-only operation"]
+                SS["Optional screenshot context<br/>Separate Screen Recording permission screen"]
+                SSA["Allow screenshots<br/>Still requires per-image preview / send consent"]
+                SSS["Skip screenshots<br/>No capture"]
+                START["Start first scan<br/>Explicit action; no XP"]
+                STREAM["Streaming activity<br/>Simulated events; no workspace connected"]
+                WORK["Keep working<br/>Collapse companion; retain scan state"]
+                REOPEN["Reopen companion<br/>Restore activity / current quest"]
+                READY["First quest ready<br/>Review now while scan continues"]
+                DECK["Quest card<br/>Left: duration / Right: task choices"]
+                EMPTY["No quests found<br/>Only after successful scan completion"]
+                PART["Some quests ready; scan incomplete<br/>Review available quests + retry failed source"]
+                FAIL["Scan could not finish<br/>No quests ready; fix access / retry"]
+                W --> C --> A
+                A -->|verified| V --> AX
+                A -->|failure| F --> C
+                AX --> AXA --> SS
+                AX --> AXS --> SS
+                SS --> SSA --> START
+                SS --> SSS --> START
+                START --> STREAM
+                STREAM -->|keep working| WORK --> REOPEN
+                REOPEN --> STREAM
+                STREAM -->|first quest created| READY --> DECK
+                STREAM -->|complete with zero quests| EMPTY
+                STREAM -->|some sources failed| PART
+                STREAM -->|all sources failed| FAIL
+                PART -->|review| DECK
+                PART -->|retry failed source| STREAM
+                FAIL -->|fix access| C
+                FAIL -->|retry| STREAM
+                classDef screen fill:#fcfcf7,stroke:#73836a,color:#27332d
+                classDef failure fill:#f7efdf,stroke:#a58a56,color:#503f22
+                class W,C,V,AX,AXA,AXS,SS,SSA,SSS,START,STREAM,WORK,REOPEN,READY,DECK,EMPTY screen
+                class F,PART,FAIL failure
+            </script>
+          </section>
+        </details>
+      </section>
+    </main>
+    <script src="assets/open-loops.js"></script>
+    <link rel="stylesheet" href="assets/open-loops-2.css" />
+    <script type="module" src="assets/open-loops-2.mjs"></script>
+  </body>
+</html>

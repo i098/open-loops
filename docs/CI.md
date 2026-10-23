@@ -4,9 +4,11 @@
 
 The user authorized commits, private GitHub publication, CI/CD, and required PR checks after the initial documentation-only checkpoint. Earlier no-commit/no-push restrictions no longer apply to this publication workstream. Destructive history changes, public disclosure, native releases, and unapproved source writes remain outside scope.
 
-Authenticated GitHub user: `i098`. `repos/i098/open-loops` initially returned HTTP 404. The new [i098/open-loops](https://github.com/i098/open-loops) repository was created **private**, its visibility was confirmed, and local `origin` is `https://github.com/i098/open-loops.git`. No unrelated existing repository was reused. Final source synchronization, local checks, first push, Actions verification, and branch protection are still pending at this checkpoint.
+Authenticated GitHub user: `i098`. `repos/i098/open-loops` initially returned HTTP 404. The new [i098/open-loops](https://github.com/i098/open-loops) repository was created **private**, its visibility was confirmed, and local `origin` is `https://github.com/i098/open-loops.git`. Documentation bootstrap `dd4ff34` was pushed to main. Completed previews and CI are being prepared on `feat/verified-previews-ci`; no PR is merged. No unrelated repository was reused.
 
 The actual application deliverable is a **browser prototype plus plans**, not a Tauri application. CI must not invent a Cargo build for absent native sources.
+
+Before adding native Rust/Swift implementation, extend path selection and jobs with its real build, formatter/linter, tests, and packaging checks. Current browser-only gates must not silently become the complete native quality policy.
 
 ## Repository conventions
 
@@ -24,18 +26,18 @@ Inline application JS/CSS must be extracted into repo-local files so ESLint and 
 
 The workflow starts on every PR, every main push, and manual dispatch. There is **no top-level `paths` or `paths-ignore` filter** that can leave a required check pending.
 
-| Changed input                                                                                             | Format                                | Lint          | Browser / policy tests | Sentrux                   |
-| --------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------- | ---------------------- | ------------------------- |
-| Workflow, scripts, lockfile/package, Node version, lint/format/test/Sentrux config, Git ignore/attributes | Run                                   | Code and docs | Run                    | Run                       |
-| Application HTML / JS / CSS                                                                               | Run                                   | Code          | Run                    | Run                       |
-| Tests                                                                                                     | Run for supported text                | Code for JS   | Run                    | Run for source extensions |
-| Markdown docs only                                                                                        | Run                                   | Markdown only | Skip                   | Skip                      |
-| Preview SVG/image asset only                                                                              | Skip if formatter does not support it | Skip          | Run                    | Skip                      |
-| Review screenshot or unrelated binary only                                                                | Skip                                  | Skip          | Skip                   | Skip                      |
+| Changed input                                                                                             | Format                 | Lint          | Browser / policy tests | Sentrux                   |
+| --------------------------------------------------------------------------------------------------------- | ---------------------- | ------------- | ---------------------- | ------------------------- |
+| Workflow, scripts, lockfile/package, Node version, lint/format/test/Sentrux config, Git ignore/attributes | Run                    | Code and docs | Run                    | Run                       |
+| Application HTML / JS / CSS                                                                               | Run                    | Code          | Run                    | Run                       |
+| Tests                                                                                                     | Run for supported text | Code for JS   | Run                    | Run for source extensions |
+| Markdown docs only                                                                                        | Run                    | Markdown only | Skip                   | Skip                      |
+| Preview SVG/image asset only                                                                              | SVG: run; binary: skip | Skip          | Run                    | Skip                      |
+| Review screenshot or unrelated binary only                                                                | Skip                   | Skip          | Skip                   | Skip                      |
 
 JSON and YAML are parsed by Prettier as part of the format check. ESLint checks actual JS for undefined names and unsafe/invalid constructs. HTML validation checks structure/duplicate IDs and attributes; Stylelint checks CSS syntax/invalid properties and values. Markdownlint checks heading progression, fenced-code language/spacing, and empty links. These are focused correctness rules, not a claim of complete accessibility or security analysis.
 
-The path detector reads actual Git base/head changes using `git diff --name-only -z`; the initial main push or manual dispatch with no base considers all tracked files. Renames/deletions are conservative: both affected paths may trigger checks. The detector and final gate have executable behavior tests; workflow YAML is parsed into a semantic model for policy assertions.
+The path detector reads Git base/head changes using `git diff --no-renames --name-only -z`; the initial main push or manual dispatch with no base considers all tracked files. A rename includes both the removed source path and its destination so an extension change cannot hide relevant code. Executable tests exercise a real temporary Git rename, path selection, and gate outcomes. Workflow YAML is parsed and its delivery condition executed against main/feature/PR/dispatch cases, not merely compared as text.
 
 ## Stable required gate
 
@@ -47,11 +49,11 @@ Job name: **`PR gate`**. It depends on `detect`, `format`, `lint`, `test`, and `
 - Docs-only PRs still receive the stable gate, while unnecessary browser/Sentrux work skips.
 - Main delivery depends on gate success. No `continue-on-error`, warning-only Sentrux, or fake successful fallback is permitted.
 
-Configure branch protection to require `PR gate` after the initial commit/run exists, when the account/repository supports protection. Confirm the API response and effective rule; a local YAML file does not establish protection. If GitHub's plan restricts private-repository protection, report the exact API error instead of claiming it was installed.
+The attempted branch-protection PUT and diagnostic GET returned HTTP 403. Raw response: `{"message":"Upgrade to GitHub Pro or make this repository public to enable this feature.","documentation_url":"https://docs.github.com/rest/branches/branch-protection#get-branch-protection","status":"403"}`. Repository `permissions.admin` is true; token scopes include `repo` and `workflow`; `/user.plan` is null. This is a private-repository **account entitlement restriction**, not missing repository admin access. Keep the repository private unless the user explicitly chooses otherwise. GitHub Pro is the enabling requirement while private. The `PR gate` runs but is **not an enforced required branch-protection rule**.
 
 ## Untrusted PRs and pins
 
-The workflow uses `pull_request`, never `pull_request_target`. It grants only `contents: read`, persists no checkout credentials, and uses no repository secrets. Fork code receives no publication token. Delivery is limited to a successful **main push**, not a fork PR. Action code is pinned to real commits fetched through the GitHub API:
+The workflow uses `pull_request`, never `pull_request_target`. It grants only `contents: read`, persists no checkout credentials, and uses no repository secrets. Fork code receives no publication token. Successful main pushes produce continuous-delivery artifacts only when packaged inputs change; successful PRs produce review artifacts under the same input condition. Neither is a hosted deployment. Action code is pinned to real commits fetched through the GitHub API:
 
 | Action                    | Fetched ref | Immutable commit                           |
 | ------------------------- | ----------- | ------------------------------------------ |
@@ -75,7 +77,7 @@ The research worker proved why a naive check is unsafe:
 | `gate` without a baseline                                     | Exit 1; no automatic successful baseline                                                                              |
 | `gate --save`, then unchanged gate                            | Explicit baseline save succeeds; unchanged comparison succeeds                                                        |
 
-These experiments establish the tool behavior, **not final application acceptance**. The source owner is handling the measured render-complexity issue before final readiness. No threshold increase or artificial baseline is authorized to conceal it.
+These experiments establish tool behavior. Final browser source now passes the strict rules without raising thresholds or creating an artificial baseline; the final observed counts and score are recorded below.
 
 The CI runner must obtain the exact pinned binary and JavaScript grammar, disable telemetry before invoking it, require nonempty extracted application JS, and fail if source coverage is empty. Rules retain `max_cycles = 0`, `max_cc = 25`, and `max_fn_lines = 100`; actual final findings must be resolved or reported. Do not create/save a PR baseline and call it regression protection.
 
@@ -88,11 +90,11 @@ grammars-linux-x86_64.tar.gz
 8849f1eb07df3f6d4ea1ed422d8dee4b9b79a250682fa5646675dae466554454
 ```
 
-Do not execute upstream `install.sh`: even at this tag, it discovers `releases/latest` and installs globally. Use checked release bytes in isolated tool storage instead. The dedicated research note will supply the final exact runner recipe. No license/authentication blocker was observed with a clean tool home.
+Do not execute upstream `install.sh`: even at this tag, it discovers `releases/latest` and installs globally. `scripts/sentrux-check.mjs` instead verifies pinned release bytes, uses an isolated temporary HOME with telemetry opt-out, installs the matching JavaScript grammar, copies actual application/tooling JS into a source-only tree, and requires the pinned scanner's reported count to match. Linux uses Ubuntu 22.04 with GTK/OpenSSL shared libraries (`libgtk-3-0`, `libssl3`); no display is needed. No license/authentication blocker was observed. The first hosted Linux run remains necessary proof.
 
 ## Continuous delivery, not assumed hosting
 
-After a successful main-push gate, `scripts/bundle.mjs` creates `dist/open-loops-preview.tar.gz`. It contains the verified preview files, approved docs, and a per-file SHA-256 manifest bound to the GitHub commit. The workflow uploads this as `open-loops-preview-<commit>` for **30 days**.
+After a successful gate on main, `scripts/bundle.mjs` creates `dist/open-loops-preview.tar.gz` only when packaged inputs change. It contains verified preview files, approved docs, and a per-file SHA-256 manifest bound to the GitHub commit. The workflow uploads `open-loops-preview-<commit>` for **30 days**. PRs produce the same review bundle when previews, packaged docs/README/PLAN, or build/workflow inputs change. Unrelated Markdown outside the bundle does not trigger rebuild. Manual dispatch is an explicit override once the workflow exists on the default branch.
 
 This is an actual downloadable artifact, not an unconfigured deployment promise. It is **continuous delivery of the browser preview**. No Pages URL, native installer, public website, or GitHub Release is claimed. Pages may be considered later only if private-repository/account capabilities and intended audience are verified. GitHub Actions artifact access follows repository permissions; public disclosure is not the default.
 
@@ -115,4 +117,4 @@ npm install --ignore-scripts
 
 Observed: user `i098`; initial repository 404; created repository confirmed private; Sentrux 0.5.7; 249 npm packages installed. No credentials were written to repository docs. Initial npm engine warning reflected Node26 versus the first proposed strict Node24 range; package support now allows Node24 and newer while CI remains on Node24.
 
-Final local formatting/lint, policy tests, transformed-copy browser tests, nonempty-source Sentrux, archive build, exact commit/push, GitHub run conclusions, artifact download, and protection API results are **not yet recorded**. Replace this pending section with actual results after `FINAL-READY`, not predictions.
+Final local checks passed on companion source `5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9` and dashboard `ed789a3d7d6eebe6a50758efd06beae2cc28b8f84aadabbb49ada8b284dac7ac`: all 9 browser tests, 13 policy/import tests, formatter, language lint, strict Sentrux (3 actual application JS files / 12 total first-party JS files; quality 6824), and bundle creation. Independent browser inspection also covered the transformed desktop/prompt/320px surfaces. See [local report](verification/local-checks.md) and [source/output hashes](verification/snapshot.json). Hosted PR and artifact receipts are pending publication, not inferred from local success.

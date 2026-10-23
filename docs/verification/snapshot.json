@@ -1,0 +1,210 @@
+{
+  "status": "final source; transformed repository independently verified",
+  "runtime": {
+    "node": "v26.12.1",
+    "npm": "11.20.0",
+    "ci_node": "24"
+  },
+  "transformations": [
+    "Inline executable JavaScript and CSS extracted; execution order retained.",
+    "Relative CSS URLs rebased; repository text formatted; source HTML not edited by import.",
+    "Shared quest-sprite.svg copied byte-for-byte and excluded from formatting.",
+    "Source-owner images predate behavior-only pointer-capture and history-return fixes; independent imported-copy captures cover the final source.",
+    "Documentation was consolidated and revised; document hashes identify delivered plans, not byte-identical source imports."
+  ],
+  "checks": {
+    "format": "pass",
+    "format_check": "pass",
+    "lint": "pass",
+    "policy_tests": {
+      "passed": 13,
+      "skipped": 0
+    },
+    "browser_tests": {
+      "passed": 9,
+      "skipped": 0,
+      "retries": 0,
+      "seconds": 12.1
+    },
+    "sentrux": {
+      "version": "0.5.7",
+      "application_files": 3,
+      "first_party_files": 12,
+      "quality": 6824,
+      "max_cc": 25,
+      "max_fn_lines": 100,
+      "max_cycles": 0
+    },
+    "bundle": "dist/open-loops-preview.tar.gz"
+  },
+  "sources": [
+    {
+      "source": ".lavish/open-loops.html",
+      "source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "outputs": [
+        {
+          "path": "previews/open-loops.html",
+          "sha256": "4c0ba7d3eb6f81408720df7a0e030ba0002a3718fe76017835f4bd8fd36f241c"
+        },
+        {
+          "path": "previews/assets/open-loops.js",
+          "sha256": "b01bf80acd925bebb30ad38307275c5df9bad08de64990fa23c099004f006012"
+        },
+        {
+          "path": "previews/assets/open-loops-2.mjs",
+          "sha256": "8fa3320156df283077acb6ec8921f038c487ba13a0019133e40e0ffcae395105"
+        },
+        {
+          "path": "previews/assets/open-loops.css",
+          "sha256": "444fae51d91f6f9ff74bc905c615884ce0c99f7f83ee295d9becb5bf71a65d4a"
+        },
+        {
+          "path": "previews/assets/open-loops-2.css",
+          "sha256": "271518107d312e9846d821bbe3cf3a6b55cb32c0feec7fc4d5902409863a1c34"
+        }
+      ]
+    },
+    {
+      "source": ".lavish/personal-observability.html",
+      "source_sha256": "ed789a3d7d6eebe6a50758efd06beae2cc28b8f84aadabbb49ada8b284dac7ac",
+      "outputs": [
+        {
+          "path": "previews/personal-observability.html",
+          "sha256": "d5177e1321c27d4a21d877d85f45d95e05e707a8219a5f45372ea29aa06b987d"
+        },
+        {
+          "path": "previews/assets/personal-observability.js",
+          "sha256": "4948761bfdc45c6164ca37cc25ecbffe64347593582c1bfa17b82f2248b27fec"
+        },
+        {
+          "path": "previews/assets/personal-observability.css",
+          "sha256": "6c72d388da0559bfa83601303b881a13a9168250fba613a14917aa5651f2e2f2"
+        }
+      ]
+    },
+    {
+      "source": ".lavish/quest-sprite.svg",
+      "source_sha256": "2d2bf1d2bf100c94591d61b19f60c592295890c7fce82339b8a5f768ad5f84db",
+      "outputs": [
+        {
+          "path": "previews/quest-sprite.svg",
+          "sha256": "2d2bf1d2bf100c94591d61b19f60c592295890c7fce82339b8a5f768ad5f84db"
+        }
+      ]
+    }
+  ],
+  "images": [
+    {
+      "source": ".lavish/final-large-desktop.png",
+      "source_sha256": "243c829bdbc17f046e57589824b3edc8cb5cc2d40b25065959c6144caab92935",
+      "capture_source_sha256": "374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f",
+      "path": "docs/images/companion-desktop.png",
+      "sha256": "243c829bdbc17f046e57589824b3edc8cb5cc2d40b25065959c6144caab92935"
+    },
+    {
+      "source": ".lavish/final-large-bottom.png",
+      "source_sha256": "7d90d98d4a4f6037d50fe7793dcec6df24c3d776e177f46b3416c61daa323250",
+      "capture_source_sha256": "374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f",
+      "path": "docs/images/companion-bottom.png",
+      "sha256": "7d90d98d4a4f6037d50fe7793dcec6df24c3d776e177f46b3416c61daa323250"
+    },
+    {
+      "source": ".lavish/final-large-options.png",
+      "source_sha256": "67ed0cf55b19fff6f93d60414d2157a335472ab124c325861205f8f8d120acda",
+      "capture_source_sha256": "374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f",
+      "path": "docs/images/companion-options.png",
+      "sha256": "67ed0cf55b19fff6f93d60414d2157a335472ab124c325861205f8f8d120acda"
+    },
+    {
+      "source": ".lavish/final-large-prompt.png",
+      "source_sha256": "74eadc3c92cc704b7ed8762b05716850777791d7d981cc2637e117548b6ce423",
+      "capture_source_sha256": "374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f",
+      "path": "docs/images/companion-prompt.png",
+      "sha256": "74eadc3c92cc704b7ed8762b05716850777791d7d981cc2637e117548b6ce423"
+    },
+    {
+      "source": ".lavish/final-large-mobile.png",
+      "source_sha256": "8ac115f2cc2b6e1b53e188f3775841a140aba4968205d4a55cc9c0e55e4624b0",
+      "capture_source_sha256": "374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f",
+      "path": "docs/images/companion-mobile.png",
+      "sha256": "8ac115f2cc2b6e1b53e188f3775841a140aba4968205d4a55cc9c0e55e4624b0"
+    },
+    {
+      "source": ".lavish/final-large-mobile-controls.png",
+      "source_sha256": "23aae2b432cff1755e8fbcf92d4fdb982498c557970f9733f1de8fb155ce3e34",
+      "capture_source_sha256": "374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f",
+      "path": "docs/images/companion-mobile-controls.png",
+      "sha256": "23aae2b432cff1755e8fbcf92d4fdb982498c557970f9733f1de8fb155ce3e34"
+    },
+    {
+      "source": ".lavish/final-large-mobile-390.png",
+      "source_sha256": "0bfc19a4253e4820d5fe762ea2af39e26a528b9145534c420950d3fe8af06529",
+      "capture_source_sha256": "374b364a1ac5c864a90087da62a036e9b1c15ebc9e9ae792ee6866bc3e0c593f",
+      "path": "docs/images/companion-mobile-390.png",
+      "sha256": "0bfc19a4253e4820d5fe762ea2af39e26a528b9145534c420950d3fe8af06529"
+    },
+    {
+      "kind": "independent transformed-copy browser capture",
+      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "path": "docs/images/imported-desktop.png",
+      "sha256": "73301427b8c1e28bc179f1a41da6aad0015dc01d3ba7a4b355054a99765abf6e"
+    },
+    {
+      "kind": "independent transformed-copy browser capture",
+      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "path": "docs/images/imported-prompt.png",
+      "sha256": "b8fd1299ff27cae70f3198c8b137d169a04a15c14fb4617c132460661cfaab64"
+    },
+    {
+      "kind": "independent transformed-copy browser capture",
+      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "path": "docs/images/imported-mobile.png",
+      "sha256": "c1b44d9a8b3148514b8dc58b46e6dffd09134bbec02e9582c5a8b68bb55631eb"
+    },
+    {
+      "kind": "independent transformed-copy browser capture",
+      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "path": "docs/images/imported-mobile-controls.png",
+      "sha256": "c0333b7d8cb79f21ea8ea46ea6fa18cfb1c7b3980ba7b9d93b2b68d38e991cab"
+    },
+    {
+      "kind": "unchanged historical dashboard image",
+      "path": "docs/images/personal-observability-desktop.png",
+      "sha256": "86c7a1e917c09b32e54eb3f9457467e77416682c20f5e16a384594d83c73b6ce"
+    }
+  ],
+  "documents": [
+    {
+      "path": "README.md",
+      "sha256": "5aae54ee50b8cb469e26198991be3864eddd793323d27776c0878874f0368d44"
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "d71c45f02283fc53b9d4586433d7f0271eb4ac92bf287f65ff3dd41675ced93e"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "265e9fbf782d7216d20b2d7a9ffe1c4fcb13d34a62e432803f5e5d806fe19356"
+    },
+    {
+      "path": "docs/implementation-plan.md",
+      "sha256": "e8e4fc03d64a4cd0ce0bf27abba6b334400917bca24a74c19aed86c95a5e7bb5"
+    },
+    {
+      "path": "docs/ui-design.md",
+      "sha256": "d39b205a733ff4726d9ffefdedf66db7d71d3638f3f511bbd81ab9cf58a6f43e"
+    },
+    {
+      "path": "docs/motion.md",
+      "sha256": "464ecfb1fd759f397999a4799628c1249ea3c36f0e389dad80016edec2e0ceb3"
+    },
+    {
+      "path": "docs/onboarding-ui-flow.mmd",
+      "sha256": "52841ce7f73c66f13f7a16d9ee2f0872053f792050376bc629d3bf1e29aae581"
+    },
+    {
+      "path": "docs/redesign-direction.svg",
+      "sha256": "ff36cd4e62c8dfe7faedf1e3f9044efda590a10557172f12471867457922eaf7"
+    }
+  ]
+}

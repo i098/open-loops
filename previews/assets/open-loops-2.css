@@ -1,0 +1,43 @@
+.architecture-view {
+  margin-top: 8px;
+}
+.architecture-view > summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  padding: 18px 2px;
+}
+.architecture-view > p,
+.architecture-view > #architecture-status {
+  margin: 8px 0 16px;
+}
+.architecture-section {
+  margin: 28px 0;
+}
+.architecture-section h3 {
+  font-size: 17px;
+  margin-bottom: 14px;
+}
+.architecture-scroll {
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--sheet);
+  padding: 16px;
+}
+.architecture-figure {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.architecture-figure svg {
+  display: block;
+  width: 100%;
+  min-width: 1000px;
+  height: auto;
+  max-width: none !important;
+}
+.architecture-section:nth-of-type(2) .architecture-figure svg {
+  min-width: 1450px;
+}

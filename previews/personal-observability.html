@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en" data-theme="silk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My day — Open Loops · Example day</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+    <link rel="stylesheet" href="assets/personal-observability.css" />
+  </head>
+  <body>
+    <a class="skip" href="#activity">Skip to activity</a>
+    <main class="page">
+      <header class="topbar">
+        <a class="back-link" href="open-loops.html"
+          ><span aria-hidden="true">←</span> Back to buddy</a
+        ><span class="example">Example day · synthetic data</span>
+      </header>
+      <section class="heading" aria-labelledby="day-title">
+        <div>
+          <p class="date">Thursday, 22 October 2026</p>
+          <h1 id="day-title">My day</h1>
+          <p class="lead">A record of what happened. Not a score for your attention.</p>
+        </div>
+        <div class="companion">
+          <svg class="sprite" viewBox="0 0 32 32" role="img" aria-label="Guide companion">
+            <use href="quest-sprite.svg#guide-idle" width="32" height="32" />
+          </svg>
+          <div>
+            <strong
+              >Guide ·
+              <span
+                id="xp-label"
+                style="display: inline; color: inherit; font-size: inherit"
+              ></span></strong
+            ><span>Quest acceptance XP</span>
+            <div class="progress-track" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+      <section class="metrics" aria-label="Example day totals, all event types">
+        <div class="metric">
+          <strong id="accepted-total"></strong>
+          <p class="metric-label">Quests accepted</p>
+          <span class="metric-note">A decision, not completion</span>
+        </div>
+        <div class="metric">
+          <strong id="prepared-total"></strong>
+          <p class="metric-label">Agent jobs completed</p>
+          <span class="metric-note" id="prepared-note"></span>
+        </div>
+        <div class="metric">
+          <strong id="verified-total"></strong>
+          <p class="metric-label">Source-verified closures</p>
+          <span class="metric-note" id="stale-note"></span>
+        </div>
+        <div class="metric">
+          <strong id="decision-total"></strong>
+          <p class="metric-label">Median decision time</p>
+          <span class="metric-note" id="decision-note"></span>
+        </div>
+      </section>
+      <details class="definitions">
+        <summary>What these numbers mean</summary>
+        <div class="definition-grid">
+          <p>
+            <strong>Accepted:</strong> unique quest IDs with an explicit acceptance event. Each gets
+            10 XP once, even if the job later fails.
+          </p>
+          <p>
+            <strong>Completed:</strong> unique agent jobs with a result-ready event. A prepared
+            draft is not a sent message or source change.
+          </p>
+          <p>
+            <strong>Verified closure:</strong> a source readback confirms open → closed after
+            separate approval. “Stale” means the request was open for at least 30 days. All receipts
+            here are fixtures.
+          </p>
+          <p>
+            <strong>Decision time:</strong> question submitted → explicit decision confirmed,
+            including evidence wait. Median of matched pairs in this example day. No baseline or
+            measured improvement is claimed.
+          </p>
+        </div>
+      </details>
+      <section id="activity" aria-label="Personal activity and memory">
+        <div class="tabs-row">
+          <div class="view-tabs" role="tablist" aria-label="Record view">
+            <button
+              class="view-tab"
+              id="timeline-tab"
+              role="tab"
+              aria-selected="true"
+              aria-controls="record-panel"
+              data-view="timeline"
+            >
+              Timeline <span id="event-count"></span></button
+            ><button
+              class="view-tab"
+              id="memory-tab"
+              role="tab"
+              aria-selected="false"
+              aria-controls="record-panel"
+              tabindex="-1"
+              data-view="memory"
+            >
+              Saved memory <span id="memory-count"></span>
+            </button>
+          </div>
+          <p class="scope">Day totals stay unchanged when filtering</p>
+        </div>
+        <div class="workspace" id="record-panel" role="tabpanel" aria-labelledby="timeline-tab">
+          <section class="list-side" aria-label="Record list">
+            <div class="list-toolbar">
+              <div class="filters" role="group" aria-label="Filter event type">
+                <button class="filter" data-filter="all" aria-pressed="true">All</button
+                ><button class="filter" data-filter="context" aria-pressed="false">Context</button
+                ><button class="filter" data-filter="quest" aria-pressed="false">Quests</button
+                ><button class="filter" data-filter="agent" aria-pressed="false">Agents</button
+                ><button class="filter" data-filter="source" aria-pressed="false">Sources</button>
+              </div>
+              <span class="showing" id="showing"></span>
+            </div>
+            <ol class="event-list" id="record-list" aria-label="Chronological events"></ol>
+            <p class="list-foot" id="list-note">
+              App changes record context, not attention or time worked. Select an event to inspect
+              its evidence.
+            </p>
+          </section>
+          <aside
+            class="inspector"
+            id="inspector"
+            aria-label="Selected record details"
+            tabindex="-1"
+          ></aside>
+        </div>
+      </section>
+      <footer class="footer">
+        <p>Example records only. No live telemetry, AX access or memory database is connected.</p>
+        <p>Open Loops · Personal observability</p>
+      </footer>
+      <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
+    </main>
+    <script src="assets/personal-observability.js"></script>
+  </body>
+</html>
