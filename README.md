@@ -53,7 +53,7 @@ Repository: [i098/open-loops](https://github.com/i098/open-loops). [Draft PR #1]
 
 Every PR and main push runs path detection and the stable **PR gate**. Relevant formatting, lint, browser/policy tests, and Sentrux must succeed; irrelevant jobs may skip. Changes to packaged inputs create a downloadable review artifact on PRs and a continuous-delivery artifact on main. Unrelated changes do not rebuild the preview.
 
-**Branch protection is not configured by this workstream:** the earlier private-repository attempt returned HTTP 403 requiring GitHub Pro or public visibility. That historical entitlement blocker is not a claim about the now-public repository. Protection was not retried after the unexpected visibility change. Workflow success alone does not enforce a branch rule.
+**Main is protected:** the exact `PR gate` context is required, branches must be up to date, administrators are included, and changes require a PR with zero human approvals. The policy was applied after a GET confirmed no existing protection and then verified by GET. No extra reviewer policy, auto-merge, or visibility change was introduced.
 
 ## Initialization receipt
 

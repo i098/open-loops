@@ -5,9 +5,9 @@ This direction supersedes the earlier pocket/header-rail anatomy; the obsolete d
 ## Placement and object identity
 
 - One sprite DOM instance stays in the same buddy button. There is no name/XP/navigation rail above the card, no fake desktop, no shadow or gradient workaround, and no forced recenter on open or close.
-- The user drags the 128px buddy hit area. Movement beyond 8px is placement, not activation. Store the chosen resting x/y in memory; opening, closing and ordinary state transitions never overwrite it. Clamp the displayed buddy on viewport resize without destroying the stored anchor.
+- The user drags the 128px buddy hit area. Movement beyond 8px is placement, not activation. Each deliberate drop commits the chosen resting x/y in session memory, whether open or closed. Opening, closing, and automatic viewport fitting do not overwrite it. No reload/storage persistence is implied.
 - Info is an independent card always below the displayed buddy. The deck has separate bounds, sizing, and animations; it is not an info/deck wrapper. Near the bottom edge, top-to-bottom order is **deck including circular actions, buddy, info**. Lift the buddy only enough to fit info; place the deck independently above it.
-- Close restores the resting anchor. Dragging an open buddy moves info, not the deck. A decorative inner-sprite hop changes neither anchor nor info placement; reduced motion removes that hop and uses immediate placement.
+- Close restores the latest user-dropped resting anchor. Dragging an open buddy moves info, not the deck, and its drop becomes the new anchor for subsequent close/reopen. No decorative click hop, bounce, blink-pose change, or hover travel. Only a necessary boundary correction may move the actual dock in one short monotonic path; reduced motion makes it immediate.
 - Proposed Tauri windows mirror these three independent surfaces, with a normal optional My day window and per-window capabilities. Browser layout is not proof of native focus, click-through, or multi-display behavior.
 - Review-only My day / Design & architecture links sit at the bottom corner, outside the widget. They are not a topbar or part of the quest decision.
 

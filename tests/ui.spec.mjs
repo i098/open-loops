@@ -73,6 +73,57 @@ async function expectPlacedBuddy(page) {
   const deckAfter = await card(page).boundingBox();
   expect(Math.abs(deckAfter.x - deckBefore.x)).toBeLessThanOrEqual(2);
   expect(Math.abs(deckAfter.y - deckBefore.y)).toBeLessThanOrEqual(2);
+  const dropped = await dock.boundingBox();
+  await close(page).click();
+  await expect(dialog(page)).toBeHidden();
+  expect(await dock.boundingBox()).toEqual(dropped);
+  await page.locator('#buddy-toggle').click();
+  await expect(card(page)).toBeVisible();
+  expect(await dock.boundingBox()).toEqual(dropped);
+  await expectSteadyBuddyClick(page);
+}
+
+async function expectSteadyBuddyClick(page) {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await close(page).click();
+  await expect(dialog(page)).toBeHidden();
+  const motion = page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        const samples = [];
+        const sample = () => {
+          samples.push(
+            ['#buddy-dock', '#buddy-art'].map((selector) => {
+              const bounds = globalThis.document.querySelector(selector).getBoundingClientRect();
+              return { x: bounds.x, y: bounds.y };
+            }),
+          );
+        };
+        sample();
+        globalThis.document.querySelector('#buddy-toggle').addEventListener(
+          'click',
+          () => {
+            const frame = () => {
+              sample();
+              if (samples.length < 25) globalThis.requestAnimationFrame(frame);
+              else resolve(samples);
+            };
+            globalThis.requestAnimationFrame(frame);
+          },
+          { once: true },
+        );
+      }),
+  );
+  await page.locator('#buddy-toggle').click();
+  const samples = await motion;
+  for (const index of [0, 1]) {
+    for (const axis of ['x', 'y']) {
+      const values = samples.map((sample) => sample[index][axis]);
+      expect(Math.max(...values) - Math.min(...values)).toBeLessThanOrEqual(1);
+    }
+  }
+  await expect(card(page)).toBeVisible();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
 }
 
 async function openReady(page, keyboard = false) {

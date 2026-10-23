@@ -57,39 +57,21 @@ Stage a newly mounted child in its `after` position before activating it; either
 
 Commit the existing navigation state immediately. Mark every inactive real card `inert` and `aria-hidden="true"`; opacity and pointer-events alone do not remove keyboard access. Focus the active heading or restore the originating control on back, without waiting 180ms. Preserve drafts. Keyboard navigation should switch immediately with no travel.
 
-## 3. Independent deck entry and buddy hop
+## 3. Independent deck entry and necessary placement
 
-The public Panel reveal recipe uses 400ms open / 350ms close, 93.5px vertical travel, 2px blur, and the same easing. Adapt it to:
+The public Panel reveal recipe informs only deck motion:
 
 - Deck open: `translateY(24px)` / opacity `0` to `translateY(0)` / opacity `1`, **240ms**, `cubic-bezier(0.22, 1, 0.36, 1)`.
 - Deck close: reverse those states over **160ms**. No blur, scale, or delayed interaction. Info is not inside this moving layer and never moves during child navigation.
-- Position first: info always follows below the displayed buddy. Near bottom, top-to-bottom order is deck including circular actions, buddy, info. Lift the buddy only enough to fit info and fit the deck independently above it. Keep the resting anchor intact; close restores it. Open buddy drag moves info, not deck.
-- Buddy: animate only the **inner sprite**, never the outer draggable anchor. Start **60ms** after opening; one **240ms** hop with vertical offsets **0px, -12px, 0px** at offsets **0, 0.45, 1**. Do not loop or replay for child navigation.
+- Position first: info follows below the displayed buddy. Near bottom, order is deck including circular actions, buddy, info. Lift the buddy only enough to fit info; place the deck independently above it.
+- A deliberate user drop commits the new resting anchor whether the buddy is open or closed. Automatic boundary fitting never persists the temporary pose. Open drag moves info, not the deck; subsequent close/reopen must not return to an earlier user placement.
+- No decorative buddy hop, click bounce, hover travel, or click-triggered pose change. If opening requires a boundary correction, move the actual dock along one short monotonic easing path, with no overshoot, delay, or separate sprite-position owner. When no correction is needed, clicking leaves the buddy and sprite still.
 
-An illustrative browser Web Animations implementation for the decorative hop, called only by the existing closed-to-open handler:
-
-```js
-function hopBuddy(sprite) {
-  sprite.getAnimations().forEach((animation) => animation.cancel());
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  sprite.animate(
-    [
-      { transform: 'translateY(0)', offset: 0, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
-      { transform: 'translateY(-12px)', offset: 0.45, easing: 'cubic-bezier(0.55, 0, 1, 0.45)' },
-      { transform: 'translateY(0)', offset: 1 },
-    ],
-    { duration: 240, delay: 60 },
-  );
-}
-```
-
-Use a sprite-only motion wrapper if the sprite already owns other transforms/animations. Cancel this decorative animation on close, drag start, and a live switch to reduced motion. Keep the saved anchor coordinates unchanged. This is a keyframed hop, **not a spring simulation**.
-
-For reduced motion or keyboard navigation, state changes instantly: no travel, hop, scale, or delay. Apply the same rule in CSS and JS; preserve the actual open/close result and required static placement. Do not depend on `transitionend` to finish a functional state change. This single-DOM motion is not proof of native multi-window behavior.
+Reduced motion and keyboard navigation use immediate state changes without travel or delay. Do not depend on `transitionend` to finish a functional state change. This single-DOM motion is not proof of native multi-window behavior.
 
 ## 4. Sources and license
 
-Read the actual free CSS and the repository license. No premium code was fetched. The public library labels **Card stack hover** Pro; the decorative stack and hop above are original recommendations, not a copy of that recipe.
+Read the actual free CSS and repository license. No premium code was fetched. The public library labels **Card stack hover** Pro; no code from that recipe is included. The card-navigation adaptations above do not authorize decorative buddy motion.
 
 **Public documentation**
 
@@ -111,4 +93,4 @@ Retain `Transitions.dev` provenance comments and source URLs when adapting snipp
 
 ## 5. Integration check for the owning agent
 
-The owning integration check should exercise child/back, same-quest snooze, prepared-prompt edit restoration, and root right-action without changing semantics. Include reduced motion, keyboard focus, rapid navigation, narrow-window clipping, minimal buddy lift, and dragging an open buddy without moving the deck. XP and job dispatch must not depend on motion. Record actual outcomes separately; this document makes no test-pass claim.
+The integration check should exercise child/back, same-quest snooze, prepared-prompt edit restoration, and root right-action without changing semantics. Include reduced motion, a real motion-enabled click with no unnecessary buddy movement, keyboard focus, rapid navigation, narrow-window clipping, necessary boundary lift, and open-drag close/reopen placement retention while the deck stays fixed during drag. XP and job dispatch must not depend on motion. Record actual outcomes separately; this document makes no test-pass claim.

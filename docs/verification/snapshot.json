@@ -24,13 +24,13 @@
       "passed": 9,
       "skipped": 0,
       "retries": 0,
-      "seconds": 12.2
+      "seconds": 12.5
     },
     "sentrux": {
       "version": "0.5.7",
       "application_files": 3,
       "first_party_files": 12,
-      "quality": 6824,
+      "quality": 6840,
       "max_cc": 25,
       "max_fn_lines": 100,
       "max_cycles": 0
@@ -40,7 +40,7 @@
   "sources": [
     {
       "source": ".lavish/open-loops.html",
-      "source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
       "outputs": [
         {
           "path": "previews/open-loops.html",
@@ -48,7 +48,7 @@
         },
         {
           "path": "previews/assets/open-loops.js",
-          "sha256": "b01bf80acd925bebb30ad38307275c5df9bad08de64990fa23c099004f006012"
+          "sha256": "7d524888c26cc358905f2331142f0de95980c8f4f2e326c42d276f11bab1763b"
         },
         {
           "path": "previews/assets/open-loops-2.mjs",
@@ -56,7 +56,7 @@
         },
         {
           "path": "previews/assets/open-loops.css",
-          "sha256": "444fae51d91f6f9ff74bc905c615884ce0c99f7f83ee295d9becb5bf71a65d4a"
+          "sha256": "36b298175b5caaec32e806c790c872b46f9e8b3f5f79db3fa3c4ad5476f19e8f"
         },
         {
           "path": "previews/assets/open-loops-2.css",
@@ -145,27 +145,27 @@
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
       "path": "docs/images/imported-desktop.png",
-      "sha256": "73301427b8c1e28bc179f1a41da6aad0015dc01d3ba7a4b355054a99765abf6e"
+      "sha256": "76fc4742617c4de9e85cdaaacf8c1b68d5a90dcf0d1b87d21871be97920ca301"
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
       "path": "docs/images/imported-prompt.png",
-      "sha256": "b8fd1299ff27cae70f3198c8b137d169a04a15c14fb4617c132460661cfaab64"
+      "sha256": "97647bbb7cef846b9379aa1d544ef04f2b93625f3cec8f3713ec33454cca894e"
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
       "path": "docs/images/imported-mobile.png",
-      "sha256": "c1b44d9a8b3148514b8dc58b46e6dffd09134bbec02e9582c5a8b68bb55631eb"
+      "sha256": "67a4a163fdab70f9d772388be05bc90e3587c0e4e54bd50cf46e163e88e1c920"
     },
     {
       "kind": "independent transformed-copy browser capture",
-      "capture_source_sha256": "5dd268479d2797669ea451c003ad51fc6886d49ee01e56018d98c0be206dc7c9",
+      "capture_source_sha256": "82d02fd3b6a4abe991a4775cda05ee51b775946e1a59f9fb857a06e3163bef31",
       "path": "docs/images/imported-mobile-controls.png",
-      "sha256": "c0333b7d8cb79f21ea8ea46ea6fa18cfb1c7b3980ba7b9d93b2b68d38e991cab"
+      "sha256": "67d7c5ead8086468106856568db4554945175c352b16e4c2076b57fe00b0a68f"
     },
     {
       "kind": "unchanged historical dashboard image",
@@ -176,11 +176,11 @@
   "documents": [
     {
       "path": "README.md",
-      "sha256": "fe73ddcc2c43be919831e16d91de4512e170d6ada1625d974cd1748a552c0211"
+      "sha256": "cdc1ca007896d86a7c584dd7cf24efa332b09934fe147d037bb7aeeae8b216a5"
     },
     {
       "path": "PLAN.md",
-      "sha256": "d8093e5d1290a2fd2167f6b0a6d0c11bb7d29b789b080e354246e9dedf671131"
+      "sha256": "2e16ecf7cbe3c74e0d8ca6b739d25b2b4df77e7d25100e1e63de3d694b634c46"
     },
     {
       "path": "docs/architecture.md",
@@ -188,15 +188,15 @@
     },
     {
       "path": "docs/implementation-plan.md",
-      "sha256": "e8e4fc03d64a4cd0ce0bf27abba6b334400917bca24a74c19aed86c95a5e7bb5"
+      "sha256": "498d776334b357a5dd10e0bb148b9bfdaf857f0d460d9dd6ee71c7793f2dfbcb"
     },
     {
       "path": "docs/ui-design.md",
-      "sha256": "78a79a68f3c02912a3857bffc1c2026d706f13e250f351ae9070fc3c82b3cf3d"
+      "sha256": "a455c64b926fdf86b715e6b0aa32bacd134a9a4c4a8850f4fb373bbbbf5fc299"
     },
     {
       "path": "docs/motion.md",
-      "sha256": "464ecfb1fd759f397999a4799628c1249ea3c36f0e389dad80016edec2e0ceb3"
+      "sha256": "b8c1b8e529e496995d0921c672d79033c555c383ceb35bb226e0d3ca980407ba"
     },
     {
       "path": "docs/onboarding-ui-flow.mmd",
@@ -206,7 +206,7 @@
   "test_files": [
     {
       "path": "tests/ui.spec.mjs",
-      "sha256": "53fdc54e1aadf5f9d3f32b95c24fb57f2038e3f4e8fe533a3af11f36565d98bc"
+      "sha256": "e6d8cf304cdfab3dd906fbe23d635b4fbf7c12aa4c408defa6b489957eb27b58"
     }
   ]
 }

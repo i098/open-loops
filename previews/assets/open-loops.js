@@ -277,7 +277,6 @@
     pendingTimer,
     idleTimer,
     happyTimer,
-    greetTimer,
     swipeTimer,
     drag = null,
     transitioning = false,
@@ -309,7 +308,7 @@
   reducedQuery.addEventListener('change', () => {
     if (!reduced()) return;
     clearMotionGhosts();
-    [info, deck, art, body.querySelector('#swipe-card')]
+    [info, deck, dock, body.querySelector('#swipe-card')]
       .filter(Boolean)
       .forEach((e) => e.getAnimations().forEach((a) => a.cancel()));
   });
@@ -1076,8 +1075,8 @@
       y: Math.max(12, Math.min(innerHeight - 140, anchor.y)),
     };
   }
-  function positionBuddy() {
-    const a = visibleAnchor(open ? buddyPose : buddyAnchor);
+  function positionBuddy(anchor = open ? buddyPose : buddyAnchor) {
+    const a = visibleAnchor(anchor);
     dock.style.left = `${a.x}px`;
     dock.style.top = `${a.y}px`;
     dock.dataset.anchorX = String(buddyAnchor.x);
@@ -1115,13 +1114,8 @@
     clearMotionGhosts();
     const wasOpen = open,
       animate = !reduced() && !keyboard,
-      beforeTop = art.getBoundingClientRect().top;
-    let closing;
-    if (!value && wasOpen && animate) {
-      closing = presentationClone(panel);
-      closing.hidden = false;
-    }
-    [info, deck, art].forEach((node) => node.getAnimations().forEach((a) => a.cancel()));
+      before = dock.getBoundingClientRect();
+    [info, deck, dock].forEach((node) => node.getAnimations().forEach((a) => a.cancel()));
     if (value && !wasOpen) Object.assign(buddyPose, visibleAnchor());
     open = value;
     panel.hidden = !value;
@@ -1137,51 +1131,14 @@
       positionBuddy();
       toggle.focus({ preventScroll: true });
     }
-    if (animate) {
-      const base = getComputedStyle(art).transform,
-        offset = beforeTop - art.getBoundingClientRect().top,
-        lifting = value && offset > 1;
-      art.animate(
-        [
-          { transform: `${base === 'none' ? '' : base} translateY(${offset}px)`, offset: 0 },
-          {
-            transform: `${base === 'none' ? '' : base} translateY(${value ? -12 : 0}px)`,
-            offset: 0.6,
-          },
-          { transform: base, offset: 1 },
-        ],
-        { duration: 240, delay: lifting ? 0 : 60, easing: 'cubic-bezier(.22,1,.36,1)' },
-      );
-      if (value) {
-        info.animate(
-          [
-            { transform: 'translateY(8px)', opacity: 0 },
-            { transform: 'none', opacity: 1 },
-          ],
-          { duration: 180, delay: lifting ? 240 : 0, easing: 'cubic-bezier(.22,1,.36,1)' },
-        );
-        deck.animate(
-          [
-            { transform: 'translateY(12px)', opacity: 0 },
-            { transform: 'none', opacity: 1 },
-          ],
-          { duration: 240, delay: lifting ? 240 : 0, easing: 'cubic-bezier(.22,1,.36,1)' },
-        );
-      }
-      if (closing) {
-        document.body.append(closing);
-        const exits = [...closing.querySelectorAll('.info-card,.deck-component')].map(
-          (node) =>
-            node.animate(
-              [
-                { transform: 'none', opacity: 1 },
-                { transform: 'translateY(12px)', opacity: 0 },
-              ],
-              { duration: 160, easing: 'cubic-bezier(.22,1,.36,1)' },
-            ).finished,
-        );
-        Promise.allSettled(exits).then(() => closing.remove());
-      }
+    const after = dock.getBoundingClientRect(),
+      dx = before.x - after.x,
+      dy = before.y - after.y;
+    if (animate && (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5)) {
+      const frames = [{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'none' }],
+        timing = { duration: 180, easing: 'cubic-bezier(.22,1,.36,1)' };
+      dock.animate(frames, timing);
+      if (value) info.animate(frames, timing);
     }
     armIdle();
   }
@@ -1197,7 +1154,7 @@
     else toggle.focus({ preventScroll: true });
   }
   function reset() {
-    [pendingTimer, happyTimer, greetTimer, swipeTimer].forEach(clearTimeout);
+    [pendingTimer, happyTimer, swipeTimer].forEach(clearTimeout);
     for (const job of jobs.values()) {
       clearTimeout(job.stageTimer);
       clearTimeout(job.finishTimer);
@@ -1288,19 +1245,11 @@
       return;
     }
     setOpen(!open, e.detail === 0);
-    if (open) {
-      sound('pop', e);
-      if (e.detail && !reduced()) {
-        renderSprite('blink');
-        clearTimeout(greetTimer);
-        greetTimer = setTimeout(() => renderSprite('idle'), 180);
-      }
-    }
+    if (open) sound('pop', e);
   });
   toggle.addEventListener('pointerdown', (e) => {
     if (e.button !== 0 || e.isPrimary === false || buddyDrag) return;
-    [art, info].forEach((node) => node.getAnimations().forEach((a) => a.cancel()));
-    const anchor = open ? buddyPose : visibleAnchor();
+    const anchor = visibleAnchor(dock.getBoundingClientRect());
     buddyDrag = {
       id: e.pointerId,
       x: e.clientX,
@@ -1316,20 +1265,24 @@
     const dx = e.clientX - buddyDrag.x,
       dy = e.clientY - buddyDrag.y;
     if (!buddyDrag.moved && Math.hypot(dx, dy) < 8) return;
+    if (!buddyDrag.moved)
+      [dock, info].forEach((node) => node.getAnimations().forEach((a) => a.cancel()));
     buddyDrag.moved = true;
-    const anchor = open ? buddyPose : buddyAnchor;
-    anchor.x = buddyDrag.anchorX + dx;
-    anchor.y = buddyDrag.anchorY + dy;
+    buddyPose.x = buddyDrag.anchorX + dx;
+    buddyPose.y = buddyDrag.anchorY + dy;
     if (open) positionInfo();
     else {
-      Object.assign(buddyAnchor, visibleAnchor());
-      positionBuddy();
+      Object.assign(buddyPose, visibleAnchor(buddyPose));
+      positionBuddy(buddyPose);
     }
   });
   function finishBuddyDrag(e) {
     if (!buddyDrag || e.pointerId !== buddyDrag.id) return;
     suppressBuddyClick = buddyDrag.moved;
+    if (buddyDrag.moved && e.type === 'pointerup')
+      Object.assign(buddyAnchor, visibleAnchor(buddyPose));
     buddyDrag = null;
+    positionBuddy();
     if (toggle.hasPointerCapture(e.pointerId)) toggle.releasePointerCapture(e.pointerId);
     if (suppressBuddyClick)
       setTimeout(() => {

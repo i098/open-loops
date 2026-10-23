@@ -20,13 +20,13 @@ Turn a cited office loose end into a prepared prompt, one numbered decision, and
 
 - **Companion:** an independent buddy, info card, and **5:7 poker-ratio** decision deck with meaningful backing edges, no heavy header, fake desktop, or shadows. The buddy keeps its stored resting anchor for the browser session. Root actions remain circular red-X/green-check controls; on child cards the green control becomes Back. No navigation bar, Back button, or reserved navigation space appears inside any card. Close stays in the info card. Preserve focus, draft, card, and running job.
 - **Left:** choose one of three snooze times. **Right:** choose one of two or three numbered read/draft actions, inspect the full brief, then explicitly accept. Swipes themselves grant no permission and no XP.
-- **Acceptance:** +10 XP exactly once per quest ID, immediately on explicit acceptance, not completion. A slim XP bar sits at the independent info card's bottom. Pip 0–19, Scout 20–29, Guide 30+. Retries, duplicate clicks, snoozes, and source writes cannot farm XP. Sound is optional; reduced motion removes slide/hop animation.
+- **Acceptance:** +10 XP exactly once per quest ID, immediately on explicit acceptance, not completion. A slim XP bar sits at the independent info card's bottom. Pip 0–19, Scout 20–29, Guide 30+. Retries, duplicate clicks, snoozes, and source writes cannot farm XP. Sound is optional; reduced motion removes transition travel. Decorative buddy bounce/hop is disabled for everyone.
 - **Source mutation:** a separate approval of exact recipient/record/operation/payload; recheck current actor permission, source revision/status, and evidence; perform authorized write and authoritative readback. Timeouts remain unverified until reconciled.
 - **Idle:** after approximately 300 seconds of OS idle, optionally suggest a due quest quietly. Never auto-open, steal focus, accept, upload, or dispatch.
 
 The buddy is the placed anchor. An independent info card always sits below the displayed buddy and owns Preview, sound, Close, count/age, progress, and status. The separate 5:7 deck owns quests, options, prompt editing, swipes, and its own sizing, position, and motion. Both open with the buddy; deck navigation never moves the info card.
 
-Distinguish the stored **resting anchor** from the temporary **display pose**. Near the bottom edge, top-to-bottom order is **deck including circular actions, buddy, info**. Lift the displayed buddy only enough to fit the info card below it; fit the deck independently above it. Never flip info above the buddy or reserve room for the whole deck below it. Close restores the resting anchor; opening and viewport clamping must not overwrite it. Dragging an open buddy moves its info card, not the deck.
+Distinguish the stored **resting anchor** from temporary boundary fitting. Every deliberate user drop commits a new resting anchor whether open or closed; subsequent clicks and close/reopen retain it. Automatic fitting never writes that anchor. Near the bottom edge, order is **deck including circular actions, buddy, info**. Lift the displayed buddy only enough to fit info below it; fit the deck independently above it. Never flip info above the buddy or reserve room for the whole deck below it. Open drag moves info, not the deck. No decorative click bounce or hop; necessary boundary movement alone uses one short monotonic dock transition.
 
 Desktop cards are normally 320×448px, never below 260×364px when width allows. Narrow cards use `min(260px, viewport width − 24px)` at the same 5:7 ratio. Never shrink cards or essential 16px text to fit the buddy/info stack. Use the deck's own scrolling viewport for short screens so its full-size card and controls remain reachable without overlapping buddy/info.
 
@@ -61,7 +61,7 @@ Generate each quest with its 2–3 stable action options, exact briefs, hard rea
 
 Swipes render stored options immediately: no LLM/network request, loading state, or agent job. **Other… always edits the existing prepared prompt**, prefilled with current quest/option context and constrained read/draft scope. It preserves edits on Back and requires save/review before explicit Copy/Open handoff; handoff grants no XP and needs no demo acceptance. Only starting a demo/API job requires separate Accept and grants +10 XP once per quest. The three fixed snooze durations stay; there is no custom-date workflow. Typing, copying, opening a page, or navigating never implies agent execution.
 
-Keep essential text at least 16px; remove redundant minor subtexts rather than hiding safety scope. Motion follows the selected free [Transitions.dev references](docs/motion.md): 180ms/8px child-back changes, 240ms/24px deck entry, restrained buddy hop, and immediate reduced-motion/keyboard state changes. Use browser-native CSS/Web Animations; retain source provenance and the custom snippet-license limits. No Pro recipe, motion library, or CI dependency is added.
+Keep essential text at least 16px; remove redundant minor subtexts rather than hiding safety scope. The free [Transitions.dev references](docs/motion.md) inform card motion: 180ms/8px child-back changes and 240ms/24px deck entry, with immediate reduced-motion/keyboard changes. They do not authorize a buddy hop. Use browser-native CSS/Web Animations; retain source provenance and custom snippet-license limits. No Pro recipe, motion library, or CI dependency is added.
 
 ### Prompt handoff
 
@@ -123,7 +123,7 @@ Real Sentrux 0.5.7 uses pinned binary/grammar hashes, telemetry opt-out, strict 
 
 A successful main push creates an actual downloadable preview archive with a SHA-256 manifest. A successful PR may produce a review artifact when packaged inputs change. Neither means hosted deployment or native release. The exact path matrix, Action pins, commands, results, and GitHub run/artifact links belong in [CI.md](docs/CI.md).
 
-**Protection is not configured by this workstream:** the historical HTTP 403 was an entitlement restriction while the repository was private. Visibility now reads public after an external change; protection was not retried. Do not claim the workflow gate is server-enforced branch protection.
+**Main protection is enforced:** verified GET reports required `PR gate`, strict up-to-date checks, administrator enforcement, and PRs with zero human approvals. The earlier private-repository HTTP 403 is historical. No extra reviewer policy, visibility mutation, or auto-merge was introduced.
 
 ## 7. Final handoff gates
 

@@ -1653,6 +1653,9 @@ svg {
   font-size: 1rem;
   line-height: 1.5;
 }
+.buddy-toggle:active:not(:disabled) {
+  transform: none;
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
